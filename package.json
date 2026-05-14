@@ -1,0 +1,23 @@
+{
+  "name": "proyecto-c-buyer-mateandoando",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma migrate deploy && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@clerk/nextjs": "^5.0.0",
+    "next": "14.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.7.0",
+    "@types/react": "19.2.14",
+    "prisma": "^5.8.0",
+    "typescript": "^5.3.0"
+  }
+}
