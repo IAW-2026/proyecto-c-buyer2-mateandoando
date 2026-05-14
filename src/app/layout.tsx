@@ -1,4 +1,4 @@
-import './globals.css'
+import './ui/globals.css';
 
 export const metadata = {
   title: 'MateandoAndo - Buyer'
