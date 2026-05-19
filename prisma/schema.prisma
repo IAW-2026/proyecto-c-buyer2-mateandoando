@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model Buyer {
+  id_buyer        String          @id @default(uuid())
+  clerk_user_id   String          @unique
+  first_name      String
+  last_name       String
+  phone           String?
+  status          BuyerStatus     @default(ACTIVO)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  addresses       Address[]
+  carts           Cart[]
+  purchase_orders PurchaseOrder[]
+}
+
+enum BuyerStatus {
+  ACTIVO
+  SUSPENDIDO
+}
+
+model Address {
+  id_address String  @id @default(uuid())
+  id_buyer   String
+  buyer      Buyer   @relation(fields: [id_buyer], references: [id_buyer])
+  alias      String
+  street     String
+  floor_apt  String?
+  city       String
+  province   String
+  zip_code   String
+  is_default Boolean @default(false)
+}
+
+model Cart {
+  id_cart    String     @id @default(uuid())
+  id_buyer   String     @unique
+  buyer      Buyer      @relation(fields: [id_buyer], references: [id_buyer])
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  items      CartItem[]
+}
+
+model CartItem {
+  id_cart_item String @id @default(uuid())
+  id_cart      String
+  cart         Cart   @relation(fields: [id_cart], references: [id_cart])
+  id_item      String
+  quantity     Int
+}
+
+enum OrderStatus {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  REEMBOLSADO
+}
+
+model PurchaseOrder {
+  id_purchase_order    String      @id
+  id_buyer             String
+  buyer                Buyer       @relation(fields: [id_buyer], references: [id_buyer])
+  total_price          Decimal
+  status               OrderStatus @default(PENDIENTE)
+  id_payment_operation String?
+  payment_hash         String?
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt
+  packages             Package[]
+}
+
+model Package {
+  id_package        String        @id
+  id_purchase_order String
+  order             PurchaseOrder @relation(fields: [id_purchase_order], references: [id_purchase_order])
+  id_seller         String
+}
