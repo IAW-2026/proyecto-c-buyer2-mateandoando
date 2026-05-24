@@ -1,7 +1,6 @@
 import { withServiceAuth } from '@/lib/auth/clerk'
 import { clerkClient } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
-import { exists } from 'fs'
 
 export const GET = withServiceAuth(
     'X_SERVICE_TOKEN_SHIPPING',
