@@ -15,10 +15,9 @@ export default function Navbar() {
                     MateandoAndo
                 </Link>
 
-                <nav className="hidden md:flex gap-8 text-sm text-on-surface">
+                <nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
                     <Link href="/categorias" className="hover:text-primary transition-colors">Categorías</Link>
                     <Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
-                    <Link href="/descuentos" className="hover:text-primary transition-colors">Descuentos</Link>
                 </nav>
 
                 <div className="flex items-center gap-4">
