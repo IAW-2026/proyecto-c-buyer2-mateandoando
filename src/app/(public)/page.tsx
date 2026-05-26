@@ -10,7 +10,7 @@ return (
         <h1 className="text-headline-xl font-headline-xl text-primary mb-2">
           Bienvenido a MateandoAndo
         </h1>
-        <p className="text-body-lg font-body-lg text-on-surface-variant max-w-2xl">
+        <p className="text-body-lg font-body-lg text-on-surface-variant©">
           Descubrí los mejores productos artesanales de mate. Kits, termos, yerbas y accesorios seleccionados por vendedores de confianza.
         </p>
       </section>
