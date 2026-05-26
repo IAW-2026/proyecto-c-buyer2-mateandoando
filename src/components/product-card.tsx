@@ -30,9 +30,10 @@ export default function ProductCard({
     return (
         <div className="bg-surface-container-low rounded-xl overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
         
-            {/* Image area */}
+            {/* Image section */}
             <Link href={detailHref} className="relative aspect-video overflow-hidden bg-surface-container block">
-                {/* Placeholder — replaced with next/image when real URLs arrive */}
+
+                {/* Images placeholder. TODO: search and replace images */}
                 <div className="w-full h-full bg-surface-container-high flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
                     <ShoppingCart size={32} className="text-outline" />
                 </div>
@@ -47,13 +48,12 @@ export default function ProductCard({
 
             </Link>
         
-            {/* Body */}
+            {/* Content */}
                 <div className="p-4 flex flex-col flex-grow">
                     <h3 className="text-body-md font-bold text-on-surface mb-1 line-clamp-1">{name}</h3>
                     <p className="text-label-sm text-on-surface-variant mb-1">{seller_name}</p>
                     <p className="text-label-sm text-on-surface-variant mb-4 line-clamp-2">{description}</p>
                 
-                    {/* Price + cart button */}
                     <div className="mt-auto flex justify-between items-center">
                         <div className="flex flex-col">
                         {discountedPrice ? (
@@ -72,7 +72,7 @@ export default function ProductCard({
                         )}
                     </div>
                     
-                    {/* Add to cart — wired in Step 6 */}
+                    {/* Add to cart button */}
                     <Link
                         href={detailHref}
                         className="text-primary hover:text-secondary transition-colors p-1"

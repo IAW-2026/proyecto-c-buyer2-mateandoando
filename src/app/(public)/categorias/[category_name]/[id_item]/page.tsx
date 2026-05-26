@@ -49,7 +49,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 <section className="lg:col-span-7">
                     <div className="overflow-hidden rounded-xl bg-surface-container-low border border-outline-variant aspect-square flex items-center justify-center">
                         <span className="text-8xl font-heading font-bold text-outline opacity-30">
-                            {item.name[0]}
+                            {item.name[0]} {/* Just display the first letter of the product name for now */}
                         </span>
                     </div>
                 </section>
