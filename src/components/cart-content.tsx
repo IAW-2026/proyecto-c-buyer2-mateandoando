@@ -9,11 +9,14 @@ type CartItem = {
     id_item: string
     quantity: number
     product: {
+        id_item: string
         name: string
-        seller_name: string
         price: number
-        discount_pct: number
+        description: string
         category_name: string
+        id_seller: string
+        seller_name: string
+        discount_pct: number
     }
 }
 
@@ -23,21 +26,25 @@ interface Props {
 
 export default function CartContent({ initialItems }: Props) {
     const [items, setItems] = useState<CartItem[]>(initialItems)
+
+    const subtotal = items.reduce(
+        (acc, item) => acc + effectivePrice(item) * item.quantity, 0
+    )
     
     async function updateQuantity(id_cart_item: string, newQuantity: number) {
         if (newQuantity < 1)
             return
         
-        const previous = items
+        const previous = items // snapshot current state
 
+        // update the items in the UI
         setItems(prev =>
             prev.map(item =>
-                item.id_cart_item === id_cart_item
-                ? { ...item, quantity: newQuantity }
-                : item
+                item.id_cart_item === id_cart_item ? { ...item, quantity: newQuantity } : item
             )
         )
         
+        // update db
         const res = await fetch(`/api/cart/items/${id_cart_item}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -46,6 +53,7 @@ export default function CartContent({ initialItems }: Props) {
         
         if (!res.ok)
             setItems(previous)
+            // Display an error message?
     }
     
     async function removeItem(id_cart_item: string) {
@@ -55,6 +63,7 @@ export default function CartContent({ initialItems }: Props) {
             item => item.id_cart_item !== id_cart_item)
         )
         
+        // Remove from db
         const res = await fetch(`/api/cart/items/${id_cart_item}`, {
             method: 'DELETE',
         })
@@ -65,26 +74,24 @@ export default function CartContent({ initialItems }: Props) {
     
     function effectivePrice(item: CartItem) {
         return item.product.discount_pct > 0
-        ? Math.round(item.product.price * (1 - item.product.discount_pct / 100))
+        ? Math.round(item.product.price * (1 - item.product.discount_pct / 100)) // TODO: Test this
         : item.product.price
     }
     
-    const subtotal = items.reduce(
-        (acc, item) => acc + effectivePrice(item) * item.quantity, 0
-    )
-    
     if (items.length === 0) {
+        // Cart is empty
+
         return (
                 <div className="flex flex-col items-center justify-center py-24 gap-4 text-on-surface-variant">
-                <p className="text-body-md">
-                    Tu carrito está vacío.
+                    <p className="text-body-md">
+                        Tu carrito está vacío.
                     </p>
-                <Link
-                    href="/"
-                    className="bg-primary text-on-primary px-6 py-3 rounded-lg text-body-md font-semibold hover:opacity-90"
-                >
-                    Ver productos
-                </Link>
+                    <Link
+                        href="/"
+                        className="bg-primary text-on-primary px-6 py-3 rounded-lg text-body-md font-semibold hover:opacity-90"
+                    >
+                        Ver productos
+                    </Link>
             </div>
         )
     }
