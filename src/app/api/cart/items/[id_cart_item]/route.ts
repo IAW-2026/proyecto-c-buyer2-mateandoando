@@ -7,7 +7,8 @@ export async function PATCH(
 ) {
     const { userId } = await auth()
 
-    if (!userId) return new Response('Unauthorized', { status: 401 })
+    if (!userId)
+        return new Response('Unauthorized', { status: 401 })
 
     const body = await request.json()
     const { quantity } = body

@@ -41,14 +41,14 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
     
     const [address, setAddress] = useState({
         street: '',
-        number: '',
+        floor_apt: '',
         city: '',
         province: '',
         zip_code: '',
     })
     
     const subtotal = items.reduce(
-        (acc, item) => acc + effectivePrice(item.product.price, item.product.discount_pct) * item.quantity, 0
+        (count, item) => count + effectivePrice(item.product.price, item.product.discount_pct) * item.quantity, 0
     )
 
     const total = subtotal + shippingCost
@@ -66,7 +66,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
             body: JSON.stringify({
                 id_buyer,
                 address,
-                items: items.map(i => ({ id_item: i.id_item, quantity: i.quantity })),
+                items: items.map(item => ({ id_item: item.id_item, quantity: item.quantity })),
             }),
         })
         
@@ -100,7 +100,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                                 type="text"
                                 required
                                 value={address.street}
-                                onChange={e => setAddress(prev => ({ ...prev, street: e.target.value }))}
+                                onChange={event => setAddress(prev => ({ ...prev, street: event.target.value }))}
                                 placeholder="Av. Corrientes"
                                 className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
                             />
@@ -108,14 +108,14 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                 
                         <div className="flex flex-col gap-1">
                             <label className="text-label-md text-on-surface-variant">
-                                Número
+                                Piso / Dpto (opcional)
                             </label>
+
                             <input
                                 type="text"
-                                required
-                                value={address.number}
-                                onChange={e => setAddress(prev => ({ ...prev, number: e.target.value }))}
-                                placeholder="1234"
+                                value={address.floor_apt}
+                                onChange={event => setAddress(prev => ({ ...prev, floor_apt: event.target.value }))}
+                                placeholder="3° B"
                                 className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
                             />
                         </div>
@@ -128,7 +128,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                                 type="text"
                                 required
                                 value={address.zip_code}
-                                onChange={e => setAddress(prev => ({ ...prev, zip_code: e.target.value }))}
+                                onChange={event => setAddress(prev => ({ ...prev, zip_code: event.target.value }))}
                                 placeholder="1043"
                                 className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
                             />
@@ -142,7 +142,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                                 type="text"
                                 required
                                 value={address.city}
-                                onChange={e => setAddress(prev => ({ ...prev, city: e.target.value }))}
+                                onChange={event => setAddress(prev => ({ ...prev, city: event.target.value }))}
                                 placeholder="Buenos Aires"
                                 className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
                             />
@@ -156,7 +156,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                                 type="text"
                                 required
                                 value={address.province}
-                                onChange={e => setAddress(prev => ({ ...prev, province: e.target.value }))}
+                                onChange={event => setAddress(prev => ({ ...prev, province: event.target.value }))}
                                 placeholder="CABA"
                                 className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
                             />
