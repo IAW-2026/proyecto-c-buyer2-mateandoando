@@ -17,7 +17,7 @@ export default function AddToCartButton({ id_item }: Props) {
         idle: {
             label: 'Agregar al carrito',
             icon: <ShoppingCart size={20} />,
-            className: 'bg-primary-container text-on-primary-fixed hover:opacity-90',
+            className: 'bg-primary-container text-on-primary hover:opacity-90',
         },
         loading: {
             label: 'Agregando...',
@@ -54,7 +54,8 @@ export default function AddToCartButton({ id_item }: Props) {
                 return
             }
             
-            if (!res.ok) throw new Error()
+            if (!res.ok)
+                throw new Error()
                 
             setState('added')
             setTimeout(() => setState('idle'), 2000)

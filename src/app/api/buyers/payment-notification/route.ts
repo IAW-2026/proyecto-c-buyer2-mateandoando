@@ -1,5 +1,22 @@
 import { withServiceAuth } from '@/lib/auth/clerk'
 import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server'
+import { isServiceTokenValid } from '@/lib/auth/clerk'
+
+export async function POST(req: NextRequest) {
+  const token = req.headers.get('X-Service-Token')
+  
+  if (!isServiceTokenValid(token, 'payments')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  
+  const { id_payment_operation, status, id_purchase_order } = await req.json()
+  
+  // TODO: persist payment status to DB when schema supports it
+  console.log('Payment notification received:', { id_payment_operation, status, id_purchase_order })
+  
+  return NextResponse.json({ received: true })
+}
 
 export const PATCH = withServiceAuth(
   'X_SERVICE_TOKEN_PAYMENTS',
