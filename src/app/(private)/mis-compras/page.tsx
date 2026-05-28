@@ -110,7 +110,7 @@ export default async function MisComprasPage() {
 							</div>
 						</div>
 
-						{/* Action — vertically centered by parent items-center */}
+						{/* CTA */}
 						{firstPackageId ? (
 							<Link
 								href={`/mis-compras/${firstPackageId}/seguimiento`}
@@ -131,10 +131,10 @@ export default async function MisComprasPage() {
 		<>
 			<section className="mb-8">
 				<h1 className="text-headline-xl font-headline-xl text-primary mb-2">
-					Mis Pedidos
+					Mis Compras
 				</h1>
 				<p className="text-body-lg font-body-lg text-on-surface-variant">
-					Consultá el historial de tus adquisiciones.
+					Consultá el historial de tus compras.
 				</p>
 			</section>
 

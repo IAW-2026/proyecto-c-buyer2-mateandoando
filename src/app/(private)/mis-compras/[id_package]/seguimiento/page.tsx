@@ -41,7 +41,7 @@ export default async function SeguimientoPage({
 
 	if (!buyer) notFound()
 
-	// Get the tracked package (used for ownership check + tracking status)
+	// Get the tracked package
 	const orderPackage = await db.package.findUnique({
 		where: { id_package },
 		include: {
@@ -173,7 +173,7 @@ export default async function SeguimientoPage({
 				</span>
 			</div>
 
-			{/* Products grouped by seller */}
+			{/* Products are grouped by seller */}
 			{enrichedPackages.map(pkg => (
 				<div key={pkg.id_package} className="flex flex-col gap-2 border-t border-outline-variant pt-4">
 					<Link
@@ -196,7 +196,7 @@ export default async function SeguimientoPage({
 				</div>
 			))}
 
-			{/* Totals */}
+			{/* Amounts */}
 			<div className="flex flex-col gap-2 border-t border-outline-variant pt-4">
 				<div className="flex justify-between text-body-sm">
 					<span className="text-on-surface-variant">Subtotal productos</span>
