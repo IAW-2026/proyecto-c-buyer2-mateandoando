@@ -67,6 +67,7 @@ export default function CheckoutForm({ items, id_buyer, shippingCost, shippingDa
                 id_buyer,
                 address,
                 items: items.map(item => ({ id_item: item.id_item, quantity: item.quantity })),
+                shipping_cost: shippingCost,
             }),
         })
         

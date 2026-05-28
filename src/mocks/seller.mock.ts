@@ -132,11 +132,12 @@ export const sellerMock = {
 	},
 
 	async createPurchaseOrder(id_buyer: string, items: { id_item: string, quantity: number }[]) {
-		const itemMap: Record<string, { price: number, id_seller: string }> = {}
+		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
 		for (const item of ITEMS) {
 			itemMap[item.id_item] = {
 				price: item.price,
 				id_seller: item.id_seller,
+				discount_pct: item.discount_pct,
 			}
 		}
 
@@ -144,13 +145,16 @@ export const sellerMock = {
 		let total_price = 0
 
 		for (const { id_item, quantity } of items) {
-			const info = itemMap[id_item] ?? { price: 1000, id_seller: 'seller_1' }
-			total_price += info.price * quantity
+			const info = itemMap[id_item] ?? { price: 1000, id_seller: 'seller_1', discount_pct: 0 }
+			const unit_price = info.discount_pct > 0
+				? Math.round(info.price * (1 - info.discount_pct / 100))
+				: info.price
+			total_price += unit_price * quantity
 			if (!packageMap[info.id_seller]) packageMap[info.id_seller] = []
 			packageMap[info.id_seller].push({
 				id_item,
 				quantity,
-				unit_price: info.price,
+				unit_price,
 			})
 		}
 

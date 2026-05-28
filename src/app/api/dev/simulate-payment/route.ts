@@ -13,15 +13,16 @@ export async function POST(req: NextRequest) {
     const notificationRes = await fetch(
         new URL(notificationEndpoint, req.url).toString(),
         {
-            method: 'POST',
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'X-Service-Token': process.env.X_SERVICE_TOKEN_PAYMENTS ?? '',
             },
             body: JSON.stringify({
+                id_purchase_order: body.id_purchase_order ?? '',
                 id_payment_operation: body.id_payment_operation ?? 'pay_mock_1',
                 status: body.status ?? 'APROBADO',
-                id_purchase_order: body.id_purchase_order ?? '',
+                payment_hash: body.payment_hash ?? 'mock_hash_' + Date.now(),
             }),
         }
     )
