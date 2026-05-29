@@ -11,7 +11,7 @@ const statusLabel: Record<string, string> = {
 }
 
 const statusTextColor: Record<string, string> = {
-	PENDIENTE:   'text-on-surface-variant',
+	PENDIENTE:   'text-secondary',
 	APROBADO:    'text-primary',
 	RECHAZADO:   'text-error',
 	REEMBOLSADO: 'text-on-surface-variant',
@@ -82,7 +82,7 @@ export default async function MisComprasPage() {
 								<p className="text-body-md text-on-surface">
 									{new Date(order.created_at).toLocaleDateString('es-AR', {
 										day: '2-digit',
-										month: 'short',
+										month: '2-digit',
 										year: 'numeric',
 									})}
 								</p>
