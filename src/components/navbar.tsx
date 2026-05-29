@@ -18,6 +18,9 @@ export default function Navbar() {
                 <nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
                     <Link href="/categorias" className="hover:text-primary transition-colors">Categorías</Link>
                     <Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
+                    {isSignedIn && (
+                        <Link href="/mis-compras" className="hover:text-primary transition-colors">Mis Compras</Link>
+                    )}
                 </nav>
 
                 <div className="flex items-center gap-4">

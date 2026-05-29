@@ -80,4 +80,13 @@ model Package {
   id_purchase_order String
   order             PurchaseOrder @relation(fields: [id_purchase_order], references: [id_purchase_order])
   id_seller         String
+  items             PackageItem[]
+}
+
+model PackageItem {
+  id_package_item String  @id @default(uuid())
+  id_package      String
+  package         Package @relation(fields: [id_package], references: [id_package])
+  id_item         String
+  quantity        Int
 }
