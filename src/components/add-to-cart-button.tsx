@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ShoppingCart, Check, AlertCircle, Loader2 } from 'lucide-react'
 import { useClerk } from '@clerk/nextjs'
+import { useCartStore } from '@/store/cart-store'
 
 interface Props {
     id_item: string
@@ -13,7 +14,8 @@ type State = 'idle' | 'loading' | 'added' | 'error'
 export default function AddToCartButton({ id_item }: Props) {
     const [state, setState] = useState<State>('idle')
     const { openSignIn } = useClerk()
-    
+    const increment = useCartStore(s => s.increment)
+
     const config = {
         idle: {
             label: 'Agregar al carrito',
@@ -36,28 +38,29 @@ export default function AddToCartButton({ id_item }: Props) {
             className: 'bg-error-container text-on-error-container',
         },
     }
-    
+
     const { label, icon, className } = config[state]
 
     async function handleClick() {
         setState('loading')
-        
+
         try {
             const res = await fetch('/api/cart/items', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id_item, quantity: 1 }),
             })
-            
+
             if (res.status === 401) {
                 setState('idle')
                 openSignIn()
                 return
             }
-            
+
             if (!res.ok)
                 throw new Error()
-                
+
+            increment()
             setState('added')
             setTimeout(() => setState('idle'), 2000)
         } catch {
@@ -65,12 +68,12 @@ export default function AddToCartButton({ id_item }: Props) {
             setTimeout(() => setState('idle'), 2000)
         }
     }
-    
+
     return (
         <button
-            onClick={ handleClick }
-            disabled={ state === 'loading' || state === 'added' }
-            className={ `w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}` }
+            onClick={handleClick}
+            disabled={state === 'loading' || state === 'added'}
+            className={`w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}`}
         >
             {icon}
             {label}

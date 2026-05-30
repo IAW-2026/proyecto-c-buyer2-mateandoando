@@ -4,6 +4,7 @@ import { useState } from 'react'
 import CartItemRow, { CartItem, effectivePrice } from '@/components/cart/cart-item-row'
 import OrderSummary from '@/components/cart/order-summary'
 import EmptyCart from '@/components/cart/empty-cart'
+import { useCartStore } from '@/store/cart-store'
 
 interface Props {
 	initialItems: CartItem[]
@@ -11,6 +12,8 @@ interface Props {
 
 export default function CartContent({ initialItems }: Props) {
 	const [items, setItems] = useState<CartItem[]>(initialItems)
+	const increment = useCartStore(s => s.increment)
+	const decrement = useCartStore(s => s.decrement)
 
 	const subtotal = items.reduce(
 		(acc, item) => acc + effectivePrice(item) * item.quantity, 0
@@ -20,47 +23,60 @@ export default function CartContent({ initialItems }: Props) {
 		if (newQuantity < 1)
 			return
 
-		const previous = items // snapshot current state
+		const previousCartItems = items
+		const olditemsQuantityInCart = items.find(i => i.id_cart_item === id_cart_item)?.quantity ?? newQuantity
+		const deltaQuantityInCart = newQuantity - olditemsQuantityInCart
 
-		// update the items in the UI
+		// Optimistic update
 		setItems(prev =>
 			prev.map(item =>
 				item.id_cart_item === id_cart_item ? { ...item, quantity: newQuantity } : item
 			)
 		)
 
-		// update db
+		if (deltaQuantityInCart > 0)
+			increment(deltaQuantityInCart)
+		else if (deltaQuantityInCart < 0)
+			decrement(-deltaQuantityInCart)
+
 		const res = await fetch(`/api/cart/items/${id_cart_item}`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ quantity: newQuantity }),
 		})
 
-		if (!res.ok)
-			setItems(previous)
-			// Display an error message?
+		if (!res.ok) {
+			// Rollback UI and store
+			setItems(previousCartItems)
+			
+			if (deltaQuantityInCart > 0)
+				decrement(deltaQuantityInCart)
+			else if (deltaQuantityInCart < 0)
+				increment(-deltaQuantityInCart)
+		}
 	}
 
 	async function removeItem(id_cart_item: string) {
-		const previous = items
+		const previousCartItems = items
+		const removedQuantity = items.find(i => i.id_cart_item === id_cart_item)?.quantity ?? 0
 
-		setItems(prev => prev.filter(
-			item => item.id_cart_item !== id_cart_item)
-		)
+		// Optimistic update
+		setItems(prev => prev.filter(item => item.id_cart_item !== id_cart_item))
+		decrement(removedQuantity)
 
-		// Remove from db
 		const res = await fetch(`/api/cart/items/${id_cart_item}`, {
 			method: 'DELETE',
 		})
 
-		if (!res.ok)
-			setItems(previous)
+		if (!res.ok) {
+			// Rollback UI and store
+			setItems(previousCartItems)
+			increment(removedQuantity)
+		}
 	}
 
-	if (items.length === 0) {
-		// Cart is empty
+	if (items.length === 0)
 		return <EmptyCart />
-	}
 
 	return (
 		<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

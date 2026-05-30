@@ -1,45 +1,66 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { ShoppingCart } from 'lucide-react'
 import { useAuth, SignInButton, UserButton } from '@clerk/nextjs'
+import { useCartStore } from '@/store/cart-store'
 
 export default function Navbar() {
-    const { isSignedIn } = useAuth()
+	const { isSignedIn } = useAuth()
+	const count = useCartStore(s => s.count)
+	const setCount = useCartStore(s => s.setCount)
 
-    return (
-        <header className="sticky top-0 z-50 h-16 bg-surface-container-low border-b border-outline-variant">
-            <div className="max-w-[1280px] mx-auto h-full px-10 max-md:px-4 flex items-center justify-between">
+	// Initialize count from DB when the user signs in
+	useEffect(() => {
+		if (!isSignedIn) {
+			setCount(0)
+			return
+		}
+		fetch('/api/cart/count')
+			.then(res => res.json())
+			.then(data => setCount(data.count ?? 0))
+			.catch(() => setCount(0))
+	}, [isSignedIn])
 
-                <Link href="/" className="font-heading text-2xl font-semibold text-primary">
-                    MateandoAndo
-                </Link>
+	return (
+		<header className="sticky top-0 z-50 h-16 bg-surface-container-low border-b border-outline-variant">
+			<div className="max-w-[1280px] mx-auto h-full px-10 max-md:px-4 flex items-center justify-between">
 
-                <nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
-                    <Link href="/categorias" className="hover:text-primary transition-colors">Categorías</Link>
-                    <Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
-                    {isSignedIn && (
-                        <Link href="/mis-compras" className="hover:text-primary transition-colors">Mis Compras</Link>
-                    )}
-                </nav>
+				<Link href="/" className="font-heading text-2xl font-semibold text-primary">
+					MateandoAndo
+				</Link>
 
-                <div className="flex items-center gap-4">
-                    <Link href="/carrito" className="text-on-surface hover:text-primary transition-colors">
-                        <ShoppingCart size={22} />
-                    </Link>
+				<nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
+					<Link href="/categorias" className="hover:text-primary transition-colors">Categorías</Link>
+					<Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
+					{isSignedIn && (
+						<Link href="/mis-compras" className="hover:text-primary transition-colors">Mis Compras</Link>
+					)}
+				</nav>
 
-                    {isSignedIn ? (
-                         <UserButton />
-                    ) : (
-                        <SignInButton mode="modal">
-                            <button className="bg-primary text-on-primary text-sm font-semibold px-4 py-2 rounded hover:opacity-90 transition-opacity">
-                                Ingresar
-                            </button>
-                         </SignInButton>
-                    )}
-                </div>
+				<div className="flex items-center gap-4">
+					<Link href="/carrito" className="relative text-on-surface hover:text-primary transition-colors">
+						<ShoppingCart size={22} />
+						{count > 0 && (
+							<span className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">
+								{count > 99 ? '99+' : count}
+							</span>
+						)}
+					</Link>
 
-            </div>
-        </header>
-      )
+					{isSignedIn ? (
+						<UserButton />
+					) : (
+						<SignInButton mode="modal">
+							<button className="bg-primary text-on-primary text-sm font-semibold px-4 py-2 rounded hover:opacity-90 transition-opacity">
+								Ingresar
+							</button>
+						</SignInButton>
+					)}
+				</div>
+
+			</div>
+		</header>
+	)
 }
