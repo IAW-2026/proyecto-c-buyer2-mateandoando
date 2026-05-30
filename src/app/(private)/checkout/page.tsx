@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { sellerService } from '@/services/seller'
 import { shippingService } from '@/services/shipping'
-import CheckoutForm from './checkout-form'
+import CheckoutForm from '@/components/checkout/checkout-content'
 
 type CartItemWithProduct = {
     id_cart_item: string

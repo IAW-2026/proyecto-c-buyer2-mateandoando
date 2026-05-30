@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { sellerService } from '@/services/seller'
-import CartContent from '@/components/cart-content'
+import CartContent from '@/components/cart/cart-content'
 
 type EnrichedCartItem = {
     id_cart_item: string
@@ -65,8 +65,7 @@ export default async function CarritoPage() {
         (item): item is EnrichedCartItem => item !== null
     )
     
-    const productText = 'producto'
-    const productosText = 'productos'
+    const productText = validItems.length === 1 ? 'producto' : 'productos'
     const emptyCartText = 'Tu carrito está vacío.'
 
     return (
@@ -78,7 +77,9 @@ export default async function CarritoPage() {
 
                     <p className="text-body-lg font-body-lg text-on-surface-variant">
                         {
-                            validItems.length === 0 ? emptyCartText : `${validItems.length} ${validItems.length === 1 ? productText : productosText} en tu carrito.`
+                            validItems.length === 0 ?
+                                emptyCartText :
+                                `${validItems.length} ${productText} en tu carrito.`
                         }
                     </p>
                 </section>
