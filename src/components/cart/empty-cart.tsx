@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default async function EmptyCart() {
+export default function EmptyCart() {
     return (
         <div className="flex flex-col items-center justify-center py-24 gap-4 text-on-surface-variant">
             <p className="text-body-md">
