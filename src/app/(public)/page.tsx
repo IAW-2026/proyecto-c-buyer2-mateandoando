@@ -14,7 +14,6 @@ return (
           Descubrí los mejores productos artesanales de mate. Kits, termos, yerbas y accesorios seleccionados por vendedores de confianza.
         </p>
       </section>
-    
 
       <section>
         <div className="flex items-center justify-between mb-6">

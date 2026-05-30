@@ -13,6 +13,7 @@ type State = 'idle' | 'loading' | 'added' | 'error'
 export default function AddToCartButton({ id_item }: Props) {
     const [state, setState] = useState<State>('idle')
     const { openSignIn } = useClerk()
+    
     const config = {
         idle: {
             label: 'Agregar al carrito',
@@ -67,9 +68,9 @@ export default function AddToCartButton({ id_item }: Props) {
     
     return (
         <button
-            onClick={handleClick}
-            disabled={state === 'loading'}
-            className={`w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}`}
+            onClick={ handleClick }
+            disabled={ state === 'loading' || state === 'added' }
+            className={ `w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}` }
         >
             {icon}
             {label}

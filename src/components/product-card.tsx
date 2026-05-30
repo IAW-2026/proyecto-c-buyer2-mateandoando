@@ -20,6 +20,7 @@ export default function ProductCard({
     seller_name,
     discount_pct,
 }: Props) {
+    
     const hasDiscount = discount_pct > 0
     const discountedPrice = hasDiscount
     ? Math.round(price * (1 - discount_pct / 100))
