@@ -1,5 +1,5 @@
 import { sellerService } from '@/services/seller'
-import CategoryCard from '@/components/category-card'
+import CategoryCard from '@/components/categories/category-card'
 
 export default async function CategoriasPage() {
 	const categories = await sellerService.getCategories()
