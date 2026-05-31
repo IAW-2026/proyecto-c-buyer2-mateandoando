@@ -131,7 +131,12 @@ export const sellerMock = {
 			}))
 	},
 
-	async createPurchaseOrder(id_buyer: string, items: { id_item: string, quantity: number }[]) {
+	async createPurchaseOrder(
+		id_buyer: string,
+		items: { id_item: string, quantity: number }[],
+		_address: string,
+		_zip_code: string,
+	) {
 		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
 		for (const item of ITEMS) {
 			itemMap[item.id_item] = {

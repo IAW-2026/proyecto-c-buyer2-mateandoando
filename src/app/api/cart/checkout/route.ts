@@ -13,7 +13,12 @@ export async function POST(req: NextRequest) {
 	const { id_buyer, address, items, shipping_cost } = await req.json()
 
 	// 1. Snapshot prices + group by seller via Seller App
-	const purchaseOrder = await sellerService.createPurchaseOrder(id_buyer, items)
+	const purchaseOrder = await sellerService.createPurchaseOrder(
+		id_buyer,
+		items,
+		address.street,
+		address.zip_code,
+	)
 
 	// 2. Request payment from Payments App
 	const payment = await paymentsService.createPayment()
