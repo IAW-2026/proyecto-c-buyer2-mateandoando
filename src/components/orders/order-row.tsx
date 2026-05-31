@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import CancelOrderButton from '@/components/orders/cancel-order-button'
 
 const statusLabel: Record<string, string> = {
 	PENDIENTE:   'Pendiente',
@@ -86,16 +87,21 @@ export default function OrderRow({
 			</div>
 
 			{/* CTA */}
-			{firstPackageId ? (
-				<Link
-					href={`/mis-compras/${firstPackageId}/seguimiento`}
-					className="border border-outline-variant text-on-surface px-5 py-2 rounded-lg text-body-sm font-medium hover:bg-surface-container transition-colors flex-shrink-0"
-				>
-					Ver detalle
-				</Link>
-			) : (
-				<span className="text-label-sm text-on-surface-variant flex-shrink-0">Sin paquetes</span>
-			)}
+			<div className="flex flex-col gap-2 flex-shrink-0 w-36">
+				{firstPackageId ? (
+					<Link
+						href={`/mis-compras/${firstPackageId}/seguimiento`}
+						className="block text-center w-full border border-outline-variant text-on-surface px-5 py-2 rounded-lg text-body-sm font-medium hover:bg-surface-container transition-colors"
+					>
+						Ver detalle
+					</Link>
+				) : (
+					<span className="text-label-sm text-on-surface-variant">Sin paquetes</span>
+				)}
+				{(status === 'PENDIENTE' || status === 'APROBADO') && (
+					<CancelOrderButton id_purchase_order={id_purchase_order} />
+				)}
+			</div>
 
 		</div>
 	)

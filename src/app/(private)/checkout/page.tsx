@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { sellerService } from '@/services/seller'
-import { shippingService } from '@/services/shipping'
 import CheckoutForm from '@/components/checkout/checkout-content'
 
 type CartItemWithProduct = {
@@ -58,27 +57,28 @@ export default async function CheckoutPage() {
         )
     }
     
-    const enriched = await Promise.all(
-        cartItems.map(async (cartItem) => {
-            const product = await sellerService.getItemDetail('', cartItem.id_item)
-            
-            if (!product)
-                return null
-
-            return {
-                id_cart_item: cartItem.id_cart_item,
-                id_item: cartItem.id_item,
-                quantity: cartItem.quantity,
-                product,
-            }
-        })
+    const { items: allItems } = await sellerService.getItems()
+    const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
+        allItems.map((item: { id_item: string }) => [item.id_item, item])
     )
+
+    const enriched = cartItems.map(cartItem => {
+        const product = itemMap[cartItem.id_item]
+        
+        if (!product)
+            return null
+
+        return {
+            id_cart_item: cartItem.id_cart_item,
+            id_item: cartItem.id_item,
+            quantity: cartItem.quantity,
+            product,
+        }
+    })
     
     const validItems = enriched.filter(
         (item): item is CartItemWithProduct => item !== null
     )
-    
-    const shippingEstimate = await shippingService.estimateShipping('1000')
     
     return (
         <>
@@ -91,12 +91,10 @@ export default async function CheckoutPage() {
                     Completá tu dirección de envío para finalizar la compra.
                 </p>
             </section>
-            
+
             <CheckoutForm
                 items={validItems}
                 id_buyer={buyer.id_buyer}
-                shippingCost={shippingEstimate.cost}
-                shippingDays={shippingEstimate.estimated_days}
             />
         </>
     )

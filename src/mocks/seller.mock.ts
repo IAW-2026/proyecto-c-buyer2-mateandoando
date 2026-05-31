@@ -100,9 +100,10 @@ export const sellerMock = {
 		return ITEMS.filter(i => i.category_name === category_name)
 	},
 
-	async getItemDetail(_name: string, id_item: string) {
+	async getItemDetail(_category_name: string, id_item: string) {
 		return ITEMS.find(i => i.id_item === id_item) ?? null
 	},
+
 
 	async getSellers() {
 		return SELLERS
@@ -131,8 +132,15 @@ export const sellerMock = {
 			}))
 	},
 
-	async createPurchaseOrder(id_buyer: string, items: { id_item: string, quantity: number }[]) {
+	async createPurchaseOrder(
+		id_buyer: string,
+		items: { id_item: string, quantity: number }[],
+		_address: string,
+		_zip_code: string,
+		_token?: string,
+	) {
 		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
+
 		for (const item of ITEMS) {
 			itemMap[item.id_item] = {
 				price: item.price,
@@ -149,8 +157,12 @@ export const sellerMock = {
 			const unit_price = info.discount_pct > 0
 				? Math.round(info.price * (1 - info.discount_pct / 100))
 				: info.price
+
 			total_price += unit_price * quantity
-			if (!packageMap[info.id_seller]) packageMap[info.id_seller] = []
+
+			if (!packageMap[info.id_seller])
+				packageMap[info.id_seller] = []
+
 			packageMap[info.id_seller].push({
 				id_item,
 				quantity,

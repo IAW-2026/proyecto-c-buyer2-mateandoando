@@ -3,9 +3,9 @@ import { isServiceTokenValid } from '@/lib/auth/clerk'
 import { db } from '@/lib/db'
 
 export async function PATCH(req: NextRequest) {
-	const token = req.headers.get('X-Service-Token')
+	const key = req.headers.get('X-Api-Key')
 
-	if (!isServiceTokenValid(token ?? undefined, process.env.X_SERVICE_TOKEN_PAYMENTS)) {
+	if (!isServiceTokenValid(key ?? undefined, process.env.BUYER_APP_SECRET_KEY)) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 

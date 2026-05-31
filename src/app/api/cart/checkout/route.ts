@@ -5,20 +5,41 @@ import { sellerService } from '@/services/seller'
 import { paymentsService } from '@/services/payments'
 
 export async function POST(req: NextRequest) {
-	const { userId } = await auth()
+	const { userId, getToken } = await auth()
 
 	if (!userId)
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-	const { id_buyer, address, items, shipping_cost } = await req.json()
+	const [{ id_buyer, address, items, shipping_cost }, token] = await Promise.all([
+		req.json(),
+		getToken(),
+	])
 
 	// 1. Snapshot prices + group by seller via Seller App
-	const purchaseOrder = await sellerService.createPurchaseOrder(id_buyer, items)
-
-	// 2. Request payment from Payments App
-	const payment = await paymentsService.createPayment()
+	const purchaseOrder = await sellerService.createPurchaseOrder(
+		id_buyer,
+		items,
+		address.street,
+		address.zip_code,
+		token ?? undefined,
+	)
 
 	const totalWithShipping = purchaseOrder.total_price + (shipping_cost ?? 0)
+
+	// 2. Request payment from Payments App
+	const payment = await paymentsService.createPayment(
+		{
+			id_purchase_order: purchaseOrder.id_purchase_order,
+			id_buyer,
+			total_price: totalWithShipping,
+			packages: purchaseOrder.packages.map((pkg: { id_package: string; id_seller: string; items: { unit_price: number; quantity: number }[] }) => ({
+				id_package: pkg.id_package,
+				id_seller: pkg.id_seller,
+				amount: pkg.items.reduce((sum: number, i: { unit_price: number; quantity: number }) => sum + i.unit_price * i.quantity, 0),
+			})),
+		},
+		token ?? undefined,
+	)
 
 	// 3. Persist PurchaseOrder + Packages + Address in a single transaction
 	await db.$transaction([

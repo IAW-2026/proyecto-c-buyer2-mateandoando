@@ -16,8 +16,9 @@ export type CartItem = {
 
 interface Props {
 	items: CartItem[]
-	shippingCost: number
-	shippingDays: number
+	shippingCost: number | null
+	shippingDays: number | null
+	isEstimating: boolean
 }
 
 function effectivePrice(price: number, discount_pct: number): number {
@@ -26,12 +27,12 @@ function effectivePrice(price: number, discount_pct: number): number {
 		: price
 }
 
-export default function CheckoutSummary({ items, shippingCost, shippingDays }: Props) {
+export default function CheckoutSummary({ items, shippingCost, shippingDays, isEstimating }: Props) {
 	const subtotal = items.reduce(
 		(acc, item) => acc + effectivePrice(item.product.price, item.product.discount_pct) * item.quantity,
 		0
 	)
-	const total = subtotal + shippingCost
+	const total = shippingCost !== null ? subtotal + shippingCost : null
 
 	return (
 		<div className="lg:col-span-5">
@@ -67,13 +68,27 @@ export default function CheckoutSummary({ items, shippingCost, shippingDays }: P
 				</div>
 
 				<div className="flex justify-between text-body-md text-on-surface-variant">
-					<span>Envío ({shippingDays} días hábiles)</span>
-					<span>${shippingCost.toLocaleString('es-AR')}</span>
+					<span>
+						Envío{shippingDays !== null && !isEstimating && ` (${shippingDays} días hábiles)`}
+					</span>
+					<span>
+						{isEstimating
+							? 'Calculando...'
+							: shippingCost !== null
+								? `$${shippingCost.toLocaleString('es-AR')}`
+								: 'Ingresá tu código postal'
+						}
+					</span>
 				</div>
 
 				<div className="flex justify-between text-headline-md font-headline-md text-on-surface border-t border-outline-variant pt-4">
 					<span>Total</span>
-					<span>${total.toLocaleString('es-AR')}</span>
+					<span>
+						{total !== null
+							? `$${total.toLocaleString('es-AR')}`
+							: '—'
+						}
+					</span>
 				</div>
 			</div>
 		</div>

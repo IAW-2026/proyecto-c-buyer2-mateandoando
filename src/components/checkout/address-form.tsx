@@ -12,11 +12,12 @@ export type Address = {
 
 interface Props {
 	onSubmit: (address: Address) => void
+	onZipCodeChange: (zip_code: string) => void
 	isLoading: boolean
 	errorMessage: string | null
 }
 
-export default function AddressForm({ onSubmit, isLoading, errorMessage }: Props) {
+export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, errorMessage }: Props) {
 	const [address, setAddress] = useState<Address>({
 		street: '',
 		floor_apt: '',
@@ -73,7 +74,12 @@ export default function AddressForm({ onSubmit, isLoading, errorMessage }: Props
 							type="text"
 							required
 							value={address.zip_code}
-							onChange={event => setAddress(prev => ({ ...prev, zip_code: event.target.value }))}
+							onChange={
+								event => {
+											setAddress(prev => ({ ...prev, zip_code: event.target.value }))
+											onZipCodeChange(event.target.value)
+										}	
+							}
 							placeholder="1043"
 							className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
 						/>
