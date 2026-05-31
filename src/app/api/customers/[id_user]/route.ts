@@ -1,9 +1,9 @@
-import { withServiceAuth } from '@/lib/auth/clerk'
+import { withApiKeyAuth } from '@/lib/auth/clerk'
 import { clerkClient } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 
-export const GET = withServiceAuth(
-    'X_SERVICE_TOKEN_SHIPPING',
+export const GET = withApiKeyAuth(
+    'BUYER_API_KEY',
     async (req: Request, { params }: { params: Promise<{ id_user: string }> }) => {
         const { id_user } = await params
 
@@ -21,11 +21,12 @@ export const GET = withServiceAuth(
         }
 
         let email = ''
+
         try {
             const user = await (await clerkClient()).users.getUser(id_user)
             email = user.primaryEmailAddress?.emailAddress ?? ''
         } catch {
-            // buyer exists in DB but not in Clerk — return without email
+            // buyer exists in database but not in Clerk
         }
 
         return Response.json({

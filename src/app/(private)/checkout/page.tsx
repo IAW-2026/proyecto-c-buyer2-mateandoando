@@ -57,21 +57,24 @@ export default async function CheckoutPage() {
         )
     }
     
-    const enriched = await Promise.all(
-        cartItems.map(async (cartItem) => {
-            const product = await sellerService.getItemDetail('', cartItem.id_item)
-            
-            if (!product)
-                return null
-
-            return {
-                id_cart_item: cartItem.id_cart_item,
-                id_item: cartItem.id_item,
-                quantity: cartItem.quantity,
-                product,
-            }
-        })
+    const { items: allItems } = await sellerService.getItems()
+    const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
+        allItems.map((item: { id_item: string }) => [item.id_item, item])
     )
+
+    const enriched = cartItems.map(cartItem => {
+        const product = itemMap[cartItem.id_item]
+        
+        if (!product)
+            return null
+
+        return {
+            id_cart_item: cartItem.id_cart_item,
+            id_item: cartItem.id_item,
+            quantity: cartItem.quantity,
+            product,
+        }
+    })
     
     const validItems = enriched.filter(
         (item): item is CartItemWithProduct => item !== null

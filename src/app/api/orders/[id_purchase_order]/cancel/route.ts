@@ -2,6 +2,9 @@ import { auth } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { paymentsService } from '@/services/payments'
+import { shippingService } from '@/services/shipping'
+
+const DISPATCHED_STATUSES = ['RETIRADO', 'EN_TRANSITO', 'ENTREGADO', 'RETORNADO']
 
 export async function POST(
 	req: NextRequest,
@@ -34,11 +37,33 @@ export async function POST(
 	if (!order || order.id_buyer !== buyer.id_buyer)
 		return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-	if (order.status !== 'PENDIENTE')
+	if (order.status !== 'PENDIENTE' && order.status !== 'APROBADO')
 		return NextResponse.json(
-			{ error: 'Only PENDIENTE orders can be cancelled' },
+			{ error: 'Only PENDIENTE or APROBADO orders can be cancelled' },
 			{ status: 409 },
 		)
+
+	// For APROBADO orders, verify no package has been dispatched yet
+	if (order.status === 'APROBADO') {
+		const packages = await db.package.findMany({
+			where: { id_purchase_order },
+			select: { id_package: true },
+		})
+
+		const trackingResults = await Promise.all(
+			packages.map(pkg => shippingService.trackPackage(pkg.id_package))
+		)
+
+		const anyDispatched = trackingResults.some(t =>
+			DISPATCHED_STATUSES.includes(t.status)
+		)
+
+		if (anyDispatched)
+			return NextResponse.json(
+				{ error: 'Cannot cancel: one or more packages have already been dispatched' },
+				{ status: 409 },
+			)
+	}
 
 	const token = await getToken()
 	await paymentsService.cancelPayment(order.id_payment_operation, token ?? undefined)

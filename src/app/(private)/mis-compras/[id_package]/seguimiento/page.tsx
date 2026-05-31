@@ -52,30 +52,37 @@ export default async function SeguimientoPage({
 		include: { items: true },
 	})
 
-	// Enrich all packages with seller info and product details in parallel
-	const [tracking, enrichedPackages] = await Promise.all([
+	const uniqueSellerIds = [...new Set(allOrderPackages.map(pkg => pkg.id_seller))]
+
+	// Fetch tracking, all items and all sellers in parallel
+	const [tracking, { items: allItems }, sellerResults] = await Promise.all([
 		shippingService.trackPackage(id_package),
-		Promise.all(
-			allOrderPackages.map(async (pkg) => {
-				const [enrichedItems, seller] = await Promise.all([
-					Promise.all(
-						pkg.items.map(async (pkgItem) => {
-							const product = await sellerService.getItemDetail('', pkgItem.id_item)
-							return {
-								...pkgItem,
-								product_name: product?.name ?? 'Producto no disponible',
-								unit_price: product
-									? effectivePrice(product.price, product.discount_pct)
-									: 0,
-							}
-						})
-					),
-					sellerService.getSellerById(pkg.id_seller),
-				])
-				return { ...pkg, enrichedItems, seller }
-			})
-		),
+		sellerService.getItems(),
+		Promise.all(uniqueSellerIds.map(id => sellerService.getSellerById(id))),
 	])
+
+	const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
+		allItems.map((i: { id_item: string }) => [i.id_item, i])
+	)
+	const sellerMap: Record<string, typeof sellerResults[number]> = Object.fromEntries(
+		uniqueSellerIds.map((id, idx) => [id, sellerResults[idx]])
+	)
+
+	const enrichedPackages = allOrderPackages.map(itemsPackage => {
+		const seller = sellerMap[itemsPackage.id_seller]
+		const enrichedItems = itemsPackage.items.map(items => {
+			const product = itemMap[items.id_item]
+			return {
+				...items,
+				product_name: product?.name ?? 'Producto no disponible',
+				unit_price: product
+					? effectivePrice(product.price, product.discount_pct)
+					: 0,
+			}
+		})
+		
+		return { ...itemsPackage, enrichedItems, seller }
+	})
 
 	const productsSubtotal = enrichedPackages.reduce(
 		(acc, pkg) => acc + pkg.enrichedItems.reduce((a, i) => a + i.unit_price * i.quantity, 0),

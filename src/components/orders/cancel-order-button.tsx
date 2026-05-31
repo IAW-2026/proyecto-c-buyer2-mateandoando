@@ -25,13 +25,15 @@ export default function CancelOrderButton({ id_purchase_order }: Props) {
 			if (!res.ok) {
 				const data = await res.json()
 				setError(data.error ?? 'No se pudo cancelar la compra.')
+				setIsPending(false)
 				return
 			}
 
+			// Keep isPending true — component unmounts once router.refresh() re-fetches
+			// the server data and the order is no longer cancellable
 			router.refresh()
 		} catch {
 			setError('Error de conexión. Intentá de nuevo.')
-		} finally {
 			setIsPending(false)
 		}
 	}

@@ -98,7 +98,7 @@ export default function OrderRow({
 				) : (
 					<span className="text-label-sm text-on-surface-variant">Sin paquetes</span>
 				)}
-				{status === 'PENDIENTE' && (
+				{(status === 'PENDIENTE' || status === 'APROBADO') && (
 					<CancelOrderButton id_purchase_order={id_purchase_order} />
 				)}
 			</div>

@@ -100,9 +100,10 @@ export const sellerMock = {
 		return ITEMS.filter(i => i.category_name === category_name)
 	},
 
-	async getItemDetail(_name: string, id_item: string) {
+	async getItemDetail(_category_name: string, id_item: string) {
 		return ITEMS.find(i => i.id_item === id_item) ?? null
 	},
+
 
 	async getSellers() {
 		return SELLERS
@@ -136,6 +137,7 @@ export const sellerMock = {
 		items: { id_item: string, quantity: number }[],
 		_address: string,
 		_zip_code: string,
+		_token?: string,
 	) {
 		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
 
