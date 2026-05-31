@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { sellerService } from '@/services/seller'
-import { shippingService } from '@/services/shipping'
 import CheckoutForm from '@/components/checkout/checkout-content'
 
 type CartItemWithProduct = {
@@ -78,8 +77,6 @@ export default async function CheckoutPage() {
         (item): item is CartItemWithProduct => item !== null
     )
     
-    const shippingEstimate = await shippingService.estimateShipping('1000')
-    
     return (
         <>
             <section className="mb-8">
@@ -91,12 +88,10 @@ export default async function CheckoutPage() {
                     Completá tu dirección de envío para finalizar la compra.
                 </p>
             </section>
-            
+
             <CheckoutForm
                 items={validItems}
                 id_buyer={buyer.id_buyer}
-                shippingCost={shippingEstimate.cost}
-                shippingDays={shippingEstimate.estimated_days}
             />
         </>
     )
