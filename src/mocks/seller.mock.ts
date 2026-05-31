@@ -138,6 +138,7 @@ export const sellerMock = {
 		_zip_code: string,
 	) {
 		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
+
 		for (const item of ITEMS) {
 			itemMap[item.id_item] = {
 				price: item.price,
@@ -154,8 +155,12 @@ export const sellerMock = {
 			const unit_price = info.discount_pct > 0
 				? Math.round(info.price * (1 - info.discount_pct / 100))
 				: info.price
+
 			total_price += unit_price * quantity
-			if (!packageMap[info.id_seller]) packageMap[info.id_seller] = []
+
+			if (!packageMap[info.id_seller])
+				packageMap[info.id_seller] = []
+
 			packageMap[info.id_seller].push({
 				id_item,
 				quantity,
