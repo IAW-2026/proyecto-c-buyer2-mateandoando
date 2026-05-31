@@ -10,10 +10,31 @@ export async function POST(req: NextRequest) {
 	if (!userId)
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-	const [{ id_buyer, address, items, shipping_cost }, token] = await Promise.all([
+	const [body, token] = await Promise.all([
 		req.json(),
 		getToken(),
 	])
+
+	const { id_buyer, address, items, shipping_cost } = body
+
+	// Validate required top-level fields
+	if (!id_buyer || !address || !Array.isArray(items) || items.length === 0) {
+		return NextResponse.json(
+			{ error: 'Missing required fields: id_buyer, address, items' },
+			{ status: 400 },
+		)
+	}
+
+	// Validate required address fields
+	const missingAddressFields = (['street', 'city', 'province', 'zip_code'] as const)
+		.filter(field => !address[field]?.toString().trim())
+
+	if (missingAddressFields.length > 0) {
+		return NextResponse.json(
+			{ error: `Missing required address fields: ${missingAddressFields.join(', ')}` },
+			{ status: 400 },
+		)
+	}
 
 	// 1. Snapshot prices + group by seller via Seller App
 	const purchaseOrder = await sellerService.createPurchaseOrder(
