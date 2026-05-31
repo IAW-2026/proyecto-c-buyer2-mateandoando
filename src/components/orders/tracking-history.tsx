@@ -1,14 +1,6 @@
-const statusLabel: Record<string, string> = {
-	RETIRADO:    'Retirado del vendedor',
-	EN_TRANSITO: 'En tránsito',
-	ENTREGADO:   'Entregado',
-	RETORNADO:   'Retornado',
-}
-
 export type TrackingEvent = {
-	status: string
-	description?: string
-	timestamp?: string
+	date: string
+	event: string
 }
 
 interface Props {
@@ -37,22 +29,17 @@ export default function TrackingHistory({ history }: Props) {
 						<div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
 						<div className="flex flex-col gap-0.5">
 							<p className="text-body-md text-on-surface font-medium">
-								{statusLabel[event.status] ?? event.status}
+								{event.event}
 							</p>
-							{event.description && (
-								<p className="text-label-sm text-on-surface-variant">{event.description}</p>
-							)}
-							{event.timestamp && (
-								<p className="text-label-sm text-on-surface-variant">
-									{new Date(event.timestamp).toLocaleDateString('es-AR', {
-										day: '2-digit',
-										month: 'long',
-										year: 'numeric',
-										hour: '2-digit',
-										minute: '2-digit',
-									})}
-								</p>
-							)}
+							<p className="text-label-sm text-on-surface-variant">
+								{new Date(event.date).toLocaleDateString('es-AR', {
+									day: '2-digit',
+									month: 'long',
+									year: 'numeric',
+									hour: '2-digit',
+									minute: '2-digit',
+								})}
+							</p>
 						</div>
 					</div>
 				))}

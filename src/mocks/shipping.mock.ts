@@ -1,7 +1,6 @@
 type TrackingEvent = {
-	status: string
-	description: string
-	timestamp: string
+	date: string
+	event: string
 }
 
 type TrackingResult = {
@@ -24,24 +23,20 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'Andreani',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(48),
+					date: hoursAgo(48),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'En camino al centro de distribución.',
-					timestamp: hoursAgo(42),
+					date: hoursAgo(42),
+					event: 'En camino al centro de distribución.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'Procesado en el centro de distribución — Buenos Aires.',
-					timestamp: hoursAgo(24),
+					date: hoursAgo(24),
+					event: 'Procesado en el centro de distribución — Buenos Aires.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'Paquete en camino a tu domicilio.',
-					timestamp: hoursAgo(6),
+					date: hoursAgo(6),
+					event: 'Paquete en camino a tu domicilio.',
 				},
 			],
 		},
@@ -53,19 +48,16 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'Andreani',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(48),
+					date: hoursAgo(48),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'En tránsito hacia destino.',
-					timestamp: hoursAgo(28),
+					date: hoursAgo(28),
+					event: 'En tránsito hacia destino.',
 				},
 				{
-					status: 'ENTREGADO',
-					description: 'Entregado en el domicilio. Recibido por el destinatario.',
-					timestamp: hoursAgo(4),
+					date: hoursAgo(4),
+					event: 'Entregado en el domicilio. Recibido por el destinatario.',
 				},
 			],
 		},
@@ -77,9 +69,8 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'OCA',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(3),
+					date: hoursAgo(3),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 			],
 		},
@@ -90,9 +81,8 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'OCA',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(3),
+					date: hoursAgo(3),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 			],
 		},
@@ -104,19 +94,16 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'Correo Argentino',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(240),
+					date: hoursAgo(240),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'En tránsito hacia destino.',
-					timestamp: hoursAgo(218),
+					date: hoursAgo(218),
+					event: 'En tránsito hacia destino.',
 				},
 				{
-					status: 'RETORNADO',
-					description: 'Pago rechazado. El paquete fue retornado al vendedor.',
-					timestamp: hoursAgo(200),
+					date: hoursAgo(200),
+					event: 'Pago rechazado. El paquete fue retornado al vendedor.',
 				},
 			],
 		},
@@ -128,24 +115,20 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'Correo Argentino',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(492),
+					date: hoursAgo(492),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'En tránsito hacia destino.',
-					timestamp: hoursAgo(468),
+					date: hoursAgo(468),
+					event: 'En tránsito hacia destino.',
 				},
 				{
-					status: 'ENTREGADO',
-					description: 'Entregado en el domicilio. Recibido por el destinatario.',
-					timestamp: hoursAgo(444),
+					date: hoursAgo(444),
+					event: 'Entregado en el domicilio. Recibido por el destinatario.',
 				},
 				{
-					status: 'RETORNADO',
-					description: 'Reembolso aprobado. El paquete fue retornado al vendedor.',
-					timestamp: hoursAgo(372),
+					date: hoursAgo(372),
+					event: 'Reembolso aprobado. El paquete fue retornado al vendedor.',
 				},
 			],
 		},
@@ -156,24 +139,20 @@ function getTrackingData(id_package: string): TrackingResult {
 			carrier_name: 'Correo Argentino',
 			history: [
 				{
-					status: 'RETIRADO',
-					description: 'Paquete retirado por el transportista desde el vendedor.',
-					timestamp: hoursAgo(492),
+					date: hoursAgo(492),
+					event: 'Paquete retirado por el transportista desde el vendedor.',
 				},
 				{
-					status: 'EN_TRANSITO',
-					description: 'En tránsito hacia destino.',
-					timestamp: hoursAgo(468),
+					date: hoursAgo(468),
+					event: 'En tránsito hacia destino.',
 				},
 				{
-					status: 'ENTREGADO',
-					description: 'Entregado en el domicilio. Recibido por el destinatario.',
-					timestamp: hoursAgo(444),
+					date: hoursAgo(444),
+					event: 'Entregado en el domicilio. Recibido por el destinatario.',
 				},
 				{
-					status: 'RETORNADO',
-					description: 'Reembolso aprobado. El paquete fue retornado al vendedor.',
-					timestamp: hoursAgo(372),
+					date: hoursAgo(372),
+					event: 'Reembolso aprobado. El paquete fue retornado al vendedor.',
 				},
 			],
 		},
