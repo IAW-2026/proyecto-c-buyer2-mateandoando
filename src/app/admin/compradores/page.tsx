@@ -42,19 +42,19 @@ export default async function CompradoresPage({ searchParams }: Props) {
 
 	const totalPages = Math.ceil(total / PAGE_SIZE)
 
-	// Batch-fetch emails from Clerk as fallback when name is missing
+	// Fetch emails from Clerk to display it in case of the use has no name
 	const emailMap: Record<string, string> = {}
+
 	try {
 		const client = await clerkClient()
 		const { data } = await client.users.getUserList({
 			userId: buyers.map(b => b.clerk_user_id),
 			limit: PAGE_SIZE,
 		})
+
 		for (const u of data)
 			emailMap[u.id] = u.primaryEmailAddress?.emailAddress ?? ''
-	} catch {
-		// Non-critical — email fallback stays empty if Clerk is unreachable
-	}
+	} catch {}
 
 	function buyerDisplayName(buyer: { clerk_user_id: string; first_name: string; last_name: string }) {
 		const name = `${buyer.first_name} ${buyer.last_name}`.trim()
@@ -63,12 +63,18 @@ export default async function CompradoresPage({ searchParams }: Props) {
 
 	function buildHref(overrides: { q?: string; page?: string }) {
 		const params = new URLSearchParams()
-		const finalQ    = 'q'    in overrides ? overrides.q    : q
+		const finalQ = 'q' in overrides ? overrides.q : q
 		const finalPage = 'page' in overrides ? overrides.page : String(pageNum)
-		if (finalQ)                       params.set('q',    finalQ)
-		if (finalPage && finalPage !== '1') params.set('page', finalPage)
-		const qs = params.toString()
-		return `/admin/compradores${qs ? `?${qs}` : ''}`
+		
+		if (finalQ)
+			params.set('q', finalQ)
+
+		if (finalPage && finalPage !== '1')
+			params.set('page', finalPage)
+
+		const queryString = params.toString()
+
+		return `/admin/compradores${queryString ? `?${queryString}` : ''}`
 	}
 
 	return (
