@@ -27,7 +27,7 @@ export default function AdminNav() {
 		>
 			{/* Title — desktop only */}
 			<div className="hidden md:flex h-16 items-center px-6 border-b border-outline-variant flex-shrink-0">
-				<span className="font-semibold text-primary text-lg">🧉 Admin</span>
+				<span className="font-semibold text-primary text-lg">Admin</span>
 			</div>
 
 			{/* Links */}

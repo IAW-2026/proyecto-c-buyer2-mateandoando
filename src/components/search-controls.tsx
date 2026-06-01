@@ -19,6 +19,7 @@ interface Props {
 	order?:        string
 	orderOptions?: OrderOption[]
 	basePath?:     string
+	placeholder?:  string
 }
 
 export default function SearchControls({
@@ -26,6 +27,7 @@ export default function SearchControls({
 	order        = '',
 	orderOptions = DEFAULT_ORDER_OPTIONS,
 	basePath     = '/',
+	placeholder  = 'Buscar...',
 }: Props) {
 	const router = useRouter()
 	const [isPending, startTransition] = useTransition()
@@ -80,7 +82,7 @@ export default function SearchControls({
 					type="text"
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
-					placeholder="Buscar..."
+					placeholder={placeholder}
 					className={`w-full border border-outline-variant rounded-lg bg-surface-container-low px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary ${inputValue ? 'pr-20' : 'pr-12'}`}
 				/>
 

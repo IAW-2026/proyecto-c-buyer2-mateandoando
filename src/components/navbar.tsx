@@ -51,16 +51,16 @@ export default function Navbar() {
 			<div className="max-w-[1280px] mx-auto h-16 px-10 max-md:px-4 flex items-center justify-between">
 
 				<Link href="/" className="font-heading text-2xl font-semibold text-primary">
-					MateandoAndo
+					🧉 MateandoAndo
 				</Link>
 
 				{/* Desktop nav */}
 				<nav className="hidden md:flex gap-8" aria-label="Navegación principal">
 					<Link href="/categorias" className={navLinkClass('/categorias')}>Categorías</Link>
 					<Link href="/vendedores" className={navLinkClass('/vendedores')}>Vendedores</Link>
-					{isSignedIn && (
-						<Link href="/mis-compras" className={navLinkClass('/mis-compras')}>Mis Compras</Link>
-					)}
+					<Link href="/mis-compras" className={navLinkClass('/mis-compras')}>Mis Compras</Link>
+
+					{/* Display admin entry point only if the user is admin */}
 					{isAdmin && (
 						<Link href="/admin" className={navLinkClass('/admin')}>Admin</Link>
 					)}
@@ -115,9 +115,9 @@ export default function Navbar() {
 				>
 					<Link href="/categorias" className={navLinkClass('/categorias', true)}>Categorías</Link>
 					<Link href="/vendedores" className={navLinkClass('/vendedores', true)}>Vendedores</Link>
-					{isSignedIn && (
-						<Link href="/mis-compras" className={navLinkClass('/mis-compras', true)}>Mis Compras</Link>
-					)}
+					<Link href="/mis-compras" className={navLinkClass('/mis-compras', true)}>Mis Compras</Link>
+
+					{/* Display admin entry point only if the user is admin */}
 					{isAdmin && (
 						<Link href="/admin" className={navLinkClass('/admin', true)}>Admin</Link>
 					)}
