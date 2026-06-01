@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { db } from '@/lib/db'
 import { clerkClient } from '@clerk/nextjs/server'
-import ChangeStatusButton from '@/components/admin/change-status-button'
 
 interface Props {
 	params: Promise<{ id_buyer: string }>
@@ -56,29 +55,17 @@ export default async function BuyerDetailPage({ params }: Props) {
 			</div>
 
 			{/* Header */}
-			<div className="flex items-start justify-between mb-8">
-				<div>
-					<h1 className="text-2xl font-semibold text-on-surface">
-						{buyer.first_name} {buyer.last_name}
-					</h1>
-					{email && (
-						<p className="text-sm text-on-surface-variant mt-1">{email}</p>
-					)}
-				</div>
-				<ChangeStatusButton id_buyer={buyer.id_buyer} currentStatus={buyer.status} />
+			<div className="mb-8">
+				<h1 className="text-2xl font-semibold text-on-surface">
+					{buyer.first_name} {buyer.last_name}
+				</h1>
+				{email && (
+					<p className="text-sm text-on-surface-variant mt-1">{email}</p>
+				)}
 			</div>
 
 			{/* Info cards */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-				<InfoCard label="Estado">
-					<span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-						buyer.status === 'ACTIVO'
-							? 'bg-primary-container text-on-primary-container'
-							: 'bg-error-container text-on-error-container'
-					}`}>
-						{buyer.status}
-					</span>
-				</InfoCard>
+			<div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
 				<InfoCard label="Registrado">
 					{buyer.created_at.toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}
 				</InfoCard>

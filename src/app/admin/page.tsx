@@ -47,7 +47,7 @@ export default async function AdminDashboard() {
 
 			<div className="bg-surface-container-low border border-outline-variant rounded-xl p-6">
 				<h2 className="text-lg font-semibold text-on-surface mb-6">
-					Órdenes por estado
+					Estado de las órdenes
 				</h2>
 
 				{totalOrders === 0 ? (
@@ -55,7 +55,8 @@ export default async function AdminDashboard() {
 				) : (
 					<div className="flex flex-col gap-4">
 						{ordersByStatus.map(group => {
-							const pct = Math.round((group._count._all / totalOrders) * 100)
+							const percentage = Math.round((group._count._all / totalOrders) * 100)
+
 							return (
 								<div key={group.status} className="flex items-center gap-4">
 									<span className="w-28 text-sm text-on-surface-variant flex-shrink-0">
@@ -64,12 +65,12 @@ export default async function AdminDashboard() {
 									<div className="flex-1 bg-surface-container rounded-full h-2 overflow-hidden">
 										<div
 											className={`h-2 rounded-full ${STATUS_COLOR[group.status] ?? 'bg-primary'}`}
-											style={{ width: `${pct}%` }}
+											style={{ width: `${percentage}%` }}
 										/>
 									</div>
-									<span className="text-sm font-semibold text-on-surface w-8 text-right flex-shrink-0">
-										{group._count._all}
-									</span>
+									<p className="text-sm font-semibold text-on-surface w-8 text-right flex-shrink-0">
+										{group._count._all}({percentage}%)
+									</p>
 								</div>
 							)
 						})}

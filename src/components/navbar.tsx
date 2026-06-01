@@ -3,11 +3,13 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { ShoppingCart } from 'lucide-react'
-import { useAuth, SignInButton, UserButton } from '@clerk/nextjs'
+import { useAuth, useUser, SignInButton, UserButton } from '@clerk/nextjs'
 import { useCartStore } from '@/store/cart-store'
 
 export default function Navbar() {
 	const { isSignedIn } = useAuth()
+	const { user } = useUser()
+	const isAdmin = user?.publicMetadata?.role === 'admin-buyer'
 	const count = useCartStore(s => s.count)
 	const setCount = useCartStore(s => s.setCount)
 
@@ -36,6 +38,9 @@ export default function Navbar() {
 					<Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
 					{isSignedIn && (
 						<Link href="/mis-compras" className="hover:text-primary transition-colors">Mis Compras</Link>
+					)}
+					{isAdmin && (
+						<Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
 					)}
 				</nav>
 
