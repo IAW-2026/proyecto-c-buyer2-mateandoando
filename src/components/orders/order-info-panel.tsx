@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MapPin } from 'lucide-react'
 
 type EnrichedItem = {
 	id_package_item: string
@@ -14,12 +15,20 @@ export type EnrichedPackage = {
 	enrichedItems: EnrichedItem[]
 }
 
+type ShippingAddress = {
+	street:    string
+	floor_apt: string | null
+	city:      string
+	province:  string
+}
+
 interface Props {
 	id_purchase_order: string
-	enrichedPackages: EnrichedPackage[]
-	productsSubtotal: number
-	shippingCost: number
-	orderTotal: number
+	enrichedPackages:  EnrichedPackage[]
+	productsSubtotal:  number
+	shippingCost:      number
+	orderTotal:        number
+	address?:          ShippingAddress
 }
 
 export default function OrderInfoPanel({
@@ -28,6 +37,7 @@ export default function OrderInfoPanel({
 	productsSubtotal,
 	shippingCost,
 	orderTotal,
+	address,
 }: Props) {
 	return (
 		<div className="bg-surface-container-low border border-outline-variant rounded-xl p-6 flex flex-col gap-4 sticky top-6">
@@ -42,6 +52,23 @@ export default function OrderInfoPanel({
 					#{id_purchase_order.slice(0, 8).toUpperCase()}
 				</span>
 			</div>
+
+			{/* Shipping address */}
+			{address && (
+				<div className="flex flex-col gap-1 border-t border-outline-variant pt-4">
+					<div className="flex items-center gap-1.5 text-label-sm text-on-surface-variant mb-1">
+						<MapPin size={13} aria-hidden="true" />
+						<span>Dirección de envío</span>
+					</div>
+					<p className="text-body-sm text-on-surface">
+						{address.street}
+						{address.floor_apt ? `, ${address.floor_apt}` : ''}
+					</p>
+					<p className="text-body-sm text-on-surface-variant">
+						{address.city}, {address.province}
+					</p>
+				</div>
+			)}
 
 			{/* Products grouped by seller */}
 			{enrichedPackages.map(pkg => (

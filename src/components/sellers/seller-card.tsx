@@ -34,7 +34,6 @@ export default function SellerCard({ id_seller, name, description }: Props) {
 				
 				<ArrowRight
 					size={16}
-					className="-translate-x-1 group-hover:translate-x-0 transition-transform duration-200"
 				/>
 			</div>
 		</Link>

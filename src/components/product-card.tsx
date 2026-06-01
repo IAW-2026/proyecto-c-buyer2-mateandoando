@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ShoppingCart } from 'lucide-react'
+import { ArrowRight, Image } from 'lucide-react'
 
 interface Props {
     id_item: string
@@ -29,16 +29,14 @@ export default function ProductCard({
     const detailHref = `/categorias/${encodeURIComponent(category_name)}/${id_item}`
 
     return (
-        <div className="bg-surface-container-low rounded-xl overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300">
-
-            {/* Image link — labelled so screen readers announce the product name */}
-            <Link
-                href={detailHref}
-                aria-label={`Ver ${name}`}
-                className="relative aspect-video overflow-hidden bg-surface-container block"
-            >
+        <Link
+            href={detailHref}
+            className="bg-surface-container-low rounded-xl overflow-hidden flex flex-col group hover:shadow-lg transition-all duration-300 border border-outline-variant hover:border-primary hover:shadow-md transition-all duration-200"
+        >
+            {/* Image placeholder */}
+            <div className="relative aspect-video overflow-hidden bg-surface-container">
                 <div className="w-full h-full bg-surface-container-high flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                    <ShoppingCart size={32} aria-hidden="true" className="text-outline" />
+                    <Image size={32} aria-hidden="true" className="text-outline" />
                 </div>
 
                 {hasDiscount && (
@@ -46,7 +44,7 @@ export default function ProductCard({
                         −{discount_pct}%
                     </span>
                 )}
-            </Link>
+            </div>
 
             {/* Content */}
             <div className="p-4 flex flex-col flex-grow">
@@ -71,8 +69,9 @@ export default function ProductCard({
                             </span>
                         )}
                     </div>
+                    <ArrowRight size={18} aria-hidden="true" className="text-primary flex-shrink-0" />
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }

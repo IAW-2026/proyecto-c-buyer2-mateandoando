@@ -26,16 +26,17 @@ enum BuyerStatus {
 }
 
 model Address {
-  id_address String  @id @default(uuid())
-  id_buyer   String
-  buyer      Buyer   @relation(fields: [id_buyer], references: [id_buyer])
-  alias      String
-  street     String
-  floor_apt  String?
-  city       String
-  province   String
-  zip_code   String
-  is_default Boolean @default(false)
+  id_address      String          @id @default(uuid())
+  id_buyer        String
+  buyer           Buyer           @relation(fields: [id_buyer], references: [id_buyer])
+  alias           String
+  street          String
+  floor_apt       String?
+  city            String
+  province        String
+  zip_code        String
+  is_default      Boolean         @default(false)
+  purchase_orders PurchaseOrder[]
 }
 
 model Cart {
@@ -66,6 +67,8 @@ model PurchaseOrder {
   id_purchase_order    String      @id
   id_buyer             String
   buyer                Buyer       @relation(fields: [id_buyer], references: [id_buyer])
+  id_address           String?
+  address              Address?    @relation(fields: [id_address], references: [id_address])
   total_price          Decimal
   status               OrderStatus @default(PENDIENTE)
   id_payment_operation String?
