@@ -59,6 +59,136 @@ const ITEMS = [
 		seller_name: 'Yerba Buena Shop',
 		discount_pct: 10,
 	},
+	{
+		id_item: 'item_7',
+		name: 'Termo Cebador 1.5L',
+		price: 18000,
+		description: 'Termo con tapa cebador automático, 1.5 litros de capacidad.',
+		category_name: 'Termos',
+		id_seller: 'seller_1',
+		seller_name: 'El Mateador',
+		discount_pct: 10,
+	},
+	{
+		id_item: 'item_8',
+		name: 'Yerba CBSé 1kg',
+		price: 2800,
+		description: 'Yerba mate CBSé con hierbas naturales, bolsa de 1kg.',
+		category_name: 'Yerbas',
+		id_seller: 'seller_2',
+		seller_name: 'Yerba Buena Shop',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_9',
+		name: 'Kit Viajero',
+		price: 6500,
+		description: 'Kit compacto con mate, bombilla, funda de cuero y yerba 100g.',
+		category_name: 'Kits',
+		id_seller: 'seller_1',
+		seller_name: 'El Mateador',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_10',
+		name: 'Mate de Madera Lapacho',
+		price: 5500,
+		description: 'Mate artesanal de madera lapacho con virola de alpaca.',
+		category_name: 'Accesorios',
+		id_seller: 'seller_3',
+		seller_name: 'La Calabaza',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_11',
+		name: 'Bombilla Corazón',
+		price: 2800,
+		description: 'Bombilla de acero inoxidable con diseño corazón decorativo.',
+		category_name: 'Accesorios',
+		id_seller: 'seller_2',
+		seller_name: 'Yerba Buena Shop',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_12',
+		name: 'Yerba Rosamonte 1kg',
+		price: 2200,
+		description: 'Yerba mate Rosamonte especial sin palo, bolsa de 1kg.',
+		category_name: 'Yerbas',
+		id_seller: 'seller_2',
+		seller_name: 'Yerba Buena Shop',
+		discount_pct: 5,
+	},
+	{
+		id_item: 'item_13',
+		name: 'Termo Acero Negro 750ml',
+		price: 12000,
+		description: 'Termo de acero inoxidable negro, ideal para viajes, 750ml.',
+		category_name: 'Termos',
+		id_seller: 'seller_1',
+		seller_name: 'El Mateador',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_14',
+		name: 'Kit Familiar',
+		price: 22000,
+		description: 'Kit para toda la familia: 4 mates, 4 bombillas y 1 termo 2L.',
+		category_name: 'Kits',
+		id_seller: 'seller_1',
+		seller_name: 'El Mateador',
+		discount_pct: 15,
+	},
+	{
+		id_item: 'item_15',
+		name: 'Mate Calabaza Pintada',
+		price: 3800,
+		description: 'Mate de calabaza pintada a mano con diseños típicos argentinos.',
+		category_name: 'Accesorios',
+		id_seller: 'seller_3',
+		seller_name: 'La Calabaza',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_16',
+		name: 'Yerba Nobleza Gaucha 1kg',
+		price: 2600,
+		description: 'Yerba mate Nobleza Gaucha tradicional, bolsa de 1kg.',
+		category_name: 'Yerbas',
+		id_seller: 'seller_2',
+		seller_name: 'Yerba Buena Shop',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_18',
+		name: 'Funda Portamate',
+		price: 1500,
+		description: 'Funda de cuero vegano para proteger tu mate en los viajes.',
+		category_name: 'Accesorios',
+		id_seller: 'seller_3',
+		seller_name: 'La Calabaza',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_19',
+		name: 'Yerba Taragüi Sin Palo 1kg',
+		price: 2700,
+		description: 'Yerba mate Taragüi sin palo, sabor intenso, bolsa de 1kg.',
+		category_name: 'Yerbas',
+		id_seller: 'seller_2',
+		seller_name: 'Yerba Buena Shop',
+		discount_pct: 0,
+	},
+	{
+		id_item: 'item_20',
+		name: 'Kit Premium Edición Limitada',
+		price: 45000,
+		description: 'Kit coleccionable con mate de vidrio, bombilla plateada y termo dorado.',
+		category_name: 'Kits',
+		id_seller: 'seller_1',
+		seller_name: 'El Mateador',
+		discount_pct: 0,
+	},
 ]
 
 const SELLERS = [
@@ -100,9 +230,10 @@ export const sellerMock = {
 		return ITEMS.filter(i => i.category_name === category_name)
 	},
 
-	async getItemDetail(_name: string, id_item: string) {
+	async getItemDetail(_category_name: string, id_item: string) {
 		return ITEMS.find(i => i.id_item === id_item) ?? null
 	},
+
 
 	async getSellers() {
 		return SELLERS
@@ -131,12 +262,20 @@ export const sellerMock = {
 			}))
 	},
 
-	async createPurchaseOrder(id_buyer: string, items: { id_item: string, quantity: number }[]) {
-		const itemMap: Record<string, { price: number, id_seller: string }> = {}
+	async createPurchaseOrder(
+		id_buyer: string,
+		items: { id_item: string, quantity: number }[],
+		_address: string,
+		_zip_code: string,
+		_token?: string,
+	) {
+		const itemMap: Record<string, { price: number, id_seller: string, discount_pct: number }> = {}
+
 		for (const item of ITEMS) {
 			itemMap[item.id_item] = {
 				price: item.price,
 				id_seller: item.id_seller,
+				discount_pct: item.discount_pct,
 			}
 		}
 
@@ -144,13 +283,20 @@ export const sellerMock = {
 		let total_price = 0
 
 		for (const { id_item, quantity } of items) {
-			const info = itemMap[id_item] ?? { price: 1000, id_seller: 'seller_1' }
-			total_price += info.price * quantity
-			if (!packageMap[info.id_seller]) packageMap[info.id_seller] = []
+			const info = itemMap[id_item] ?? { price: 1000, id_seller: 'seller_1', discount_pct: 0 }
+			const unit_price = info.discount_pct > 0
+				? Math.round(info.price * (1 - info.discount_pct / 100))
+				: info.price
+
+			total_price += unit_price * quantity
+
+			if (!packageMap[info.id_seller])
+				packageMap[info.id_seller] = []
+
 			packageMap[info.id_seller].push({
 				id_item,
 				quantity,
-				unit_price: info.price,
+				unit_price,
 			})
 		}
 

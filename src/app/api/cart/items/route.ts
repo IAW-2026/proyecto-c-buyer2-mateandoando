@@ -13,9 +13,15 @@ export async function POST(request: Request) {
 
   if (!id_item || !quantity) {
     const missingFields = []
-    if (!id_item) missingFields.push('id_item')
-    if (!quantity) missingFields.push('quantity')
-    return new Response('Missing required fields: ' + missingFields.join(', '), { status: 400 })
+
+    if (!id_item) 
+      missingFields.push('id_item')
+    if (!quantity)
+      missingFields.push('quantity')
+
+    return new Response(
+      'Missing required fields: ' + missingFields.join(', '), { status: 400 }
+    )
   }
 
   const buyer = await db.buyer.findUnique({
