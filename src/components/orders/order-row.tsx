@@ -17,7 +17,7 @@ const statusTextColor: Record<string, string> = {
 
 type OrderPackage = {
 	id_package: string
-	items: { quantity: number }[]
+	items: { quantity: number; product_name: string }[]
 }
 
 interface Props {
@@ -35,11 +35,14 @@ export default function OrderRow({
 	status,
 	packages,
 }: Props) {
-	const totalQuantity = packages.reduce(
-		(acc, pkg) => acc + pkg.items.reduce((a, i) => a + i.quantity, 0),
-		0
-	)
 	const firstPackageId = packages[0]?.id_package
+
+	const allNames = packages.flatMap(pkg => 
+		pkg.items.map(item => item.quantity > 1 ? `${item.product_name} ×${item.quantity}` : item.product_name)
+	)
+
+	const displayNames = allNames.slice(0, 2).join(', ')
+	const remainder = allNames.length - 2 // to display +{count} más
 
 	return (
 		<div className="flex items-center gap-8 py-6">
@@ -66,8 +69,8 @@ export default function OrderRow({
 
 				<div className="flex flex-col gap-0.5">
 					<p className="text-label-sm text-on-surface-variant">Productos</p>
-					<p className="text-body-md text-on-surface">
-						{totalQuantity === 1 ? '1 producto' : `${totalQuantity} productos`}
+					<p className="text-body-sm text-on-surface line-clamp-2">
+						{displayNames}{remainder > 0 ? `, +${remainder} más` : ''}
 					</p>
 				</div>
 

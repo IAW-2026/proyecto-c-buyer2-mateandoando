@@ -1,4 +1,5 @@
 import { db } from '@/lib/db'
+import { clerkClient } from '@clerk/nextjs/server'
 import Link from 'next/link'
 
 const PAGE_SIZE = 20
@@ -24,10 +25,11 @@ export default async function CompradoresPage({ searchParams }: Props) {
 		db.buyer.findMany({
 			where,
 			select: {
-				id_buyer:   true,
+				id_buyer: true,
+				clerk_user_id: true,
 				first_name: true,
-				last_name:  true,
-				status:     true,
+				last_name: true,
+				status: true,
 				created_at: true,
 				_count: { select: { purchase_orders: true } },
 			},
@@ -40,14 +42,39 @@ export default async function CompradoresPage({ searchParams }: Props) {
 
 	const totalPages = Math.ceil(total / PAGE_SIZE)
 
+	// Fetch emails from Clerk to display it in case of the use has no name
+	const emailMap: Record<string, string> = {}
+
+	try {
+		const client = await clerkClient()
+		const { data } = await client.users.getUserList({
+			userId: buyers.map(b => b.clerk_user_id),
+			limit: PAGE_SIZE,
+		})
+
+		for (const u of data)
+			emailMap[u.id] = u.primaryEmailAddress?.emailAddress ?? ''
+	} catch {}
+
+	function buyerDisplayName(buyer: { clerk_user_id: string; first_name: string; last_name: string }) {
+		const name = `${buyer.first_name} ${buyer.last_name}`.trim()
+		return name || emailMap[buyer.clerk_user_id] || '—'
+	}
+
 	function buildHref(overrides: { q?: string; page?: string }) {
 		const params = new URLSearchParams()
-		const finalQ    = 'q'    in overrides ? overrides.q    : q
+		const finalQ = 'q' in overrides ? overrides.q : q
 		const finalPage = 'page' in overrides ? overrides.page : String(pageNum)
-		if (finalQ)                       params.set('q',    finalQ)
-		if (finalPage && finalPage !== '1') params.set('page', finalPage)
-		const qs = params.toString()
-		return `/admin/compradores${qs ? `?${qs}` : ''}`
+		
+		if (finalQ)
+			params.set('q', finalQ)
+
+		if (finalPage && finalPage !== '1')
+			params.set('page', finalPage)
+
+		const queryString = params.toString()
+
+		return `/admin/compradores${queryString ? `?${queryString}` : ''}`
 	}
 
 	return (
@@ -101,7 +128,7 @@ export default async function CompradoresPage({ searchParams }: Props) {
 									>
 										<div className="min-w-0">
 											<p className="font-medium text-on-surface text-sm truncate">
-												{buyer.first_name} {buyer.last_name}
+												{buyerDisplayName(buyer)}
 											</p>
 											<div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
 												<StatusBadge status={buyer.status} />
@@ -123,7 +150,7 @@ export default async function CompradoresPage({ searchParams }: Props) {
 						<table className="hidden md:table w-full text-sm">
 							<thead>
 								<tr className="border-b border-outline-variant text-on-surface-variant text-left">
-									<th className="px-6 py-3 font-medium">Nombre</th>
+									<th className="px-6 py-3 font-medium">Nombre ó email</th>
 									<th className="px-6 py-3 font-medium">Estado</th>
 									<th className="px-6 py-3 font-medium">Órdenes</th>
 									<th className="px-6 py-3 font-medium">Registrado</th>
@@ -134,7 +161,7 @@ export default async function CompradoresPage({ searchParams }: Props) {
 								{buyers.map(buyer => (
 									<tr key={buyer.id_buyer} className="hover:bg-surface-container transition-colors">
 										<td className="px-6 py-4 font-medium text-on-surface">
-											{buyer.first_name} {buyer.last_name}
+											{buyerDisplayName(buyer)}
 										</td>
 										<td className="px-6 py-4">
 											<StatusBadge status={buyer.status} />

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
+import { sellerService } from '@/services/seller'
 import EmptyOrders from '@/components/orders/empty-orders'
 import OrderRow from '@/components/orders/order-row'
 import SearchControls from '@/components/search-controls'
@@ -9,10 +10,10 @@ import Pagination from '@/components/pagination'
 const PAGE_SIZE = 10
 
 const ORDER_OPTIONS = [
-	{ value: 'newest',     label: 'Más recientes' },
-	{ value: 'oldest',     label: 'Más antiguas'  },
-	{ value: 'price_asc',  label: 'Menor precio'  },
-	{ value: 'price_desc', label: 'Mayor precio'  },
+	{ value: 'newest', label: 'Más recientes' },
+	{ value: 'oldest', label: 'Más antiguas' },
+	{ value: 'price_asc', label: 'Menor precio' },
+	{ value: 'price_desc', label: 'Mayor precio' },
 ]
 
 interface Props {
@@ -37,23 +38,47 @@ export default async function MisComprasPage({ searchParams }: Props) {
 		)
 	}
 
-	const allOrders = await db.purchaseOrder.findMany({
-		where: { id_buyer: buyer.id_buyer },
-		include: {
-			packages: {
-				include: { items: true },
+	// fetch orders of the buyer and all products in parallel
+	const [allOrders, { items: catalogue }] = await Promise.all([
+		db.purchaseOrder.findMany({
+			where: { id_buyer: buyer.id_buyer },
+			include: {
+				packages: {
+					include: { items: true },
+				},
 			},
-		},
-	})
+		}),
+		sellerService.getItems(),
+	])
 
-	// Filter by search query — matches order ID or status
+	// id_item → product name
+	const itemMap: Record<string, string> = Object.fromEntries(
+		catalogue.map((item: { id_item: string; name: string }) => [item.id_item, item.name])
+	)
+
+	// Enrich each order's package items with the product name
+	const enrichedOrders = allOrders.map(order => ({
+		...order,
+		packages: order.packages.map(pkg => ({
+			...pkg,
+			items: pkg.items.map(item => ({
+				...item,
+				product_name: itemMap[item.id_item] ?? 'Producto no disponible',
+			})),
+		})),
+	}))
+
+	// Filter by search query — matches order ID, status, or product name
 	const query = textQuery.trim().toLowerCase()
 	const filtered = query
-		? allOrders.filter(o =>
-			o.id_purchase_order.toLowerCase().includes(query) ||
-			o.status.toLowerCase().includes(query)
+		? enrichedOrders.filter(order =>
+			order.id_purchase_order.toLowerCase().includes(query) ||
+			order.status.toLowerCase().includes(query) ||
+			order.packages.some(pkg =>
+				pkg.items.some(item => item.product_name.toLowerCase().includes(query))
+			)
 		)
-		: allOrders
+		: enrichedOrders
 
 	// Sort
 	const sorted = [...filtered].sort((a, b) => {
@@ -70,13 +95,20 @@ export default async function MisComprasPage({ searchParams }: Props) {
 	const safePage    = Math.min(currentPage, totalPages)
 	const orders      = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
-	function buildPageUrl(p: number) {
+	function buildPageUrl(page: number) {
 		const params = new URLSearchParams()
-		if (textQuery) params.set('textQuery', textQuery)
-		if (order)     params.set('order', order)
-		if (p > 1)     params.set('page', String(p))
-		const qs = params.toString()
-		return qs ? `/mis-compras?${qs}` : '/mis-compras'
+		if (textQuery)
+			params.set('textQuery', textQuery)
+
+		if (order)
+			params.set('order', order)
+
+		if (page > 1)
+			params.set('page', String(page))
+
+		const queryString = params.toString()
+		
+		return queryString ? `/mis-compras?${queryString}` : '/mis-compras'
 	}
 
 	return (
@@ -98,10 +130,11 @@ export default async function MisComprasPage({ searchParams }: Props) {
 					order={order}
 					orderOptions={ORDER_OPTIONS}
 					basePath="/mis-compras"
+					placeholder="Buscar por producto o estado..."
 				/>
 			</div>
 
-			{allOrders.length === 0 ? (
+			{enrichedOrders.length === 0 ? (
 				<EmptyOrders />
 			) : (
 				<>
