@@ -68,8 +68,8 @@ export default async function AdminDashboard() {
 											style={{ width: `${percentage}%` }}
 										/>
 									</div>
-									<p className="text-sm font-semibold text-on-surface w-8 text-right flex-shrink-0">
-										{group._count._all}({percentage}%)
+									<p className="text-xs md:text-sm font-semibold text-on-surface w-20 text-right flex-shrink-0 tabular-nums">
+										{group._count._all} ({percentage}%)
 									</p>
 								</div>
 							)

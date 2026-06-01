@@ -16,9 +16,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 	return (
 		<div className="flex flex-col min-h-screen bg-surface">
 			<Navbar />
-			<div className="flex flex-1">
+
+			{/*
+				flex-col on mobile  → AdminNav (horizontal strip) stacks above main
+				flex-row on desktop → AdminNav (sidebar) sits to the left of main
+			*/}
+			<div className="flex flex-col md:flex-row flex-1 min-h-0">
 				<AdminNav />
-				<main className="flex-1 p-8 overflow-y-auto">
+				<main className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0">
 					{children}
 				</main>
 			</div>
