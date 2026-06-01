@@ -51,7 +51,7 @@ export default function Navbar() {
 			<div className="max-w-[1280px] mx-auto h-16 px-10 max-md:px-4 flex items-center justify-between">
 
 				<Link href="/" className="font-heading text-2xl font-semibold text-primary">
-					MateandoAndo
+					🧉 MateandoAndo
 				</Link>
 
 				{/* Desktop nav */}
