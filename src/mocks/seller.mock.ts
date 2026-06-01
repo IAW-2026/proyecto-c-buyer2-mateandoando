@@ -160,16 +160,6 @@ const ITEMS = [
 		discount_pct: 0,
 	},
 	{
-		id_item: 'item_17',
-		name: 'Cebador Eléctrico',
-		price: 35000,
-		description: 'Cebador eléctrico automático con control de temperatura.',
-		category_name: 'Accesorios',
-		id_seller: 'seller_1',
-		seller_name: 'El Mateador',
-		discount_pct: 25,
-	},
-	{
 		id_item: 'item_18',
 		name: 'Funda Portamate',
 		price: 1500,

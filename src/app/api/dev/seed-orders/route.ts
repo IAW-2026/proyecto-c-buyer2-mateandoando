@@ -3,35 +3,103 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { OrderStatus } from '@prisma/client'
 
-// Mock prices with discounts already applied — must match seller.mock.ts
-// item_1: 8500 (no discount)
-// item_2: 15000 × 0.80 = 12000 (20% off)
-// item_3: 2500 (no discount)
-// item_4: 3500 × 0.85 = 2975 (15% off)
-// item_5: 4500 (no discount)
-// item_6: 1800 × 0.90 = 1620 (10% off)
+// ── Effective prices (discount already applied) ───────────────────────────────
+// item_1:  8500      (Mate Kit Premium,        0%)
+// item_2:  12000     (Termo Stanley 1L,        20%  → 15000×0.80)
+// item_4:  2975      (Bombilla de Alpaca,      15%  → 3500×0.85)
+// item_5:  4500      (Mate de Calabaza,        0%)
+// item_6:  1620      (Yerba Amanda 500g,       10%  → 1800×0.90)
+// item_7:  16200     (Termo Cebador 1.5L,      10%  → 18000×0.90)
+// item_8:  2800      (Yerba CBSé 1kg,          0%)
+// item_9:  6500      (Kit Viajero,             0%)
+// item_10: 5500      (Mate de Madera Lapacho,  0%)
+// item_13: 12000     (Kit Gaucho Completo,     0%)
+// item_14: 18700     (Termo Stanley XL 1.9L,   15%  → 22000×0.85)
+// item_15: 3800      (Portamate de Cuero,      0%)
+// item_20: 45000     (Kit Premium Edición Limitada, 0%)
+// ─────────────────────────────────────────────────────────────────────────────
 
 const SHIPPING = 500
 
-const SEED_ORDERS = [
+// Stable address IDs so cleanup is deterministic
+const SEED_ADDRESSES = [
 	{
-		id_purchase_order: 'seed_order_aprobado',
-		status: OrderStatus.APROBADO,
-		total_price: 26950, // item_1(8500) + item_2(12000) + item_4×2(5950) + shipping(500)
-		id_payment_operation: 'pay_seed_aprobado',
-		daysAgo: 3,
+		id_address: 'seed_addr_caba',
+		alias:     'Envío',
+		street:    'Av. Corrientes 1234',
+		floor_apt: '3° B',
+		city:      'Buenos Aires',
+		province:  'Ciudad Autónoma de Buenos Aires',
+		zip_code:  '1043',
+	},
+	{
+		id_address: 'seed_addr_cba',
+		alias:     'Envío',
+		street:    '27 de Abril 456',
+		floor_apt: null,
+		city:      'Córdoba',
+		province:  'Córdoba',
+		zip_code:  '5000',
+	},
+	{
+		id_address: 'seed_addr_ros',
+		alias:     'Envío',
+		street:    'San Martín 789',
+		floor_apt: null,
+		city:      'Rosario',
+		province:  'Santa Fe',
+		zip_code:  '2000',
+	},
+	{
+		id_address: 'seed_addr_mza',
+		alias:     'Envío',
+		street:    'Av. San Martín 321',
+		floor_apt: null,
+		city:      'Mendoza',
+		province:  'Mendoza',
+		zip_code:  '5500',
+	},
+	{
+		id_address: 'seed_addr_tuc',
+		alias:     'Envío',
+		street:    'Av. Alem 100',
+		floor_apt: '1° A',
+		city:      'San Miguel de Tucumán',
+		province:  'Tucumán',
+		zip_code:  '4000',
+	},
+	{
+		id_address: 'seed_addr_lp',
+		alias:     'Envío',
+		street:    'Calle 7 Nro. 850',
+		floor_apt: null,
+		city:      'La Plata',
+		province:  'Buenos Aires',
+		zip_code:  '1900',
+	},
+]
+
+const SEED_ORDERS = [
+	// ── APROBADO ──────────────────────────────────────────────────────────────
+	{
+		id_purchase_order:    'seed_order_aprobado_1',
+		status:               OrderStatus.APROBADO,
+		total_price:          26950, // item_1(8500) + item_2(12000) + item_4×2(5950) + shipping(500)
+		id_payment_operation: 'pay_seed_aprobado_1',
+		id_address:           'seed_addr_caba',
+		daysAgo:              3,
 		packages: [
 			{
-				id_package: 'seed_pkg_aprobado_1',
-				id_seller: 'seller_1',
+				id_package: 'seed_pkg_aprobado_1a',
+				id_seller:  'seller_1',
 				items: [
 					{ id_item: 'item_1', quantity: 1 }, // Mate Kit Premium
 					{ id_item: 'item_2', quantity: 1 }, // Termo Stanley 1L
 				],
 			},
 			{
-				id_package: 'seed_pkg_aprobado_2',
-				id_seller: 'seller_2',
+				id_package: 'seed_pkg_aprobado_1b',
+				id_seller:  'seller_2',
 				items: [
 					{ id_item: 'item_4', quantity: 2 }, // Bombilla de Alpaca ×2
 				],
@@ -39,38 +107,43 @@ const SEED_ORDERS = [
 		],
 	},
 	{
-		id_purchase_order: 'seed_order_pendiente',
-		status: OrderStatus.PENDIENTE,
-		total_price: 10000, // item_3×2(5000) + item_5(4500) + shipping(500)
-		id_payment_operation: 'pay_seed_pendiente',
-		daysAgo: 1,
+		id_purchase_order:    'seed_order_aprobado_2',
+		status:               OrderStatus.APROBADO,
+		total_price:          28700, // item_7(16200) + item_9(6500) + item_10(5500) + shipping(500)
+		id_payment_operation: 'pay_seed_aprobado_2',
+		id_address:           'seed_addr_cba',
+		daysAgo:              8,
 		packages: [
 			{
-				id_package: 'seed_pkg_pendiente_1',
-				id_seller: 'seller_2',
+				id_package: 'seed_pkg_aprobado_2a',
+				id_seller:  'seller_1',
 				items: [
-					{ id_item: 'item_3', quantity: 2 }, // Yerba Mate Taragüi ×2
+					{ id_item: 'item_7', quantity: 1 }, // Termo Cebador 1.5L
+					{ id_item: 'item_9', quantity: 1 }, // Kit Viajero
 				],
 			},
 			{
-				id_package: 'seed_pkg_pendiente_2',
-				id_seller: 'seller_3',
+				id_package: 'seed_pkg_aprobado_2b',
+				id_seller:  'seller_3',
 				items: [
-					{ id_item: 'item_5', quantity: 1 }, // Mate de Calabaza
+					{ id_item: 'item_10', quantity: 1 }, // Mate de Madera Lapacho
 				],
 			},
 		],
 	},
+
+	// ── RECHAZADO ─────────────────────────────────────────────────────────────
 	{
-		id_purchase_order: 'seed_order_rechazado',
-		status: OrderStatus.RECHAZADO,
-		total_price: 5360, // item_6×3(4860) + shipping(500)
-		id_payment_operation: 'pay_seed_rechazado',
-		daysAgo: 10,
+		id_purchase_order:    'seed_order_rechazado_1',
+		status:               OrderStatus.RECHAZADO,
+		total_price:          5360, // item_6×3(4860) + shipping(500)
+		id_payment_operation: 'pay_seed_rechazado_1',
+		id_address:           'seed_addr_ros',
+		daysAgo:              12,
 		packages: [
 			{
-				id_package: 'seed_pkg_rechazado_1',
-				id_seller: 'seller_2',
+				id_package: 'seed_pkg_rechazado_1a',
+				id_seller:  'seller_2',
 				items: [
 					{ id_item: 'item_6', quantity: 3 }, // Yerba Amanda ×3
 				],
@@ -78,24 +151,76 @@ const SEED_ORDERS = [
 		],
 	},
 	{
-		id_purchase_order: 'seed_order_reembolsado',
-		status: OrderStatus.REEMBOLSADO,
-		total_price: 13500, // item_1(8500) + item_5(4500) + shipping(500)
-		id_payment_operation: 'pay_seed_reembolsado',
-		daysAgo: 20,
+		id_purchase_order:    'seed_order_rechazado_2',
+		status:               OrderStatus.RECHAZADO,
+		total_price:          18100, // item_13(12000) + item_8×2(5600) + shipping(500)
+		id_payment_operation: 'pay_seed_rechazado_2',
+		id_address:           'seed_addr_mza',
+		daysAgo:              18,
 		packages: [
 			{
-				id_package: 'seed_pkg_reembolsado_1',
-				id_seller: 'seller_1',
+				id_package: 'seed_pkg_rechazado_2a',
+				id_seller:  'seller_1',
 				items: [
-					{ id_item: 'item_1', quantity: 1 }, // Mate Kit Premium
+					{ id_item: 'item_13', quantity: 1 }, // Kit Gaucho Completo
 				],
 			},
 			{
-				id_package: 'seed_pkg_reembolsado_2',
-				id_seller: 'seller_3',
+				id_package: 'seed_pkg_rechazado_2b',
+				id_seller:  'seller_2',
+				items: [
+					{ id_item: 'item_8', quantity: 2 }, // Yerba CBSé ×2
+				],
+			},
+		],
+	},
+
+	// ── REEMBOLSADO ───────────────────────────────────────────────────────────
+	{
+		id_purchase_order:    'seed_order_reembolsado_1',
+		status:               OrderStatus.REEMBOLSADO,
+		total_price:          32200, // item_1(8500) + item_14(18700) + item_5(4500) + shipping(500)
+		id_payment_operation: 'pay_seed_reembolsado_1',
+		id_address:           'seed_addr_tuc',
+		daysAgo:              22,
+		packages: [
+			{
+				id_package: 'seed_pkg_reembolsado_1a',
+				id_seller:  'seller_1',
+				items: [
+					{ id_item: 'item_1',  quantity: 1 }, // Mate Kit Premium
+					{ id_item: 'item_14', quantity: 1 }, // Termo Stanley XL
+				],
+			},
+			{
+				id_package: 'seed_pkg_reembolsado_1b',
+				id_seller:  'seller_3',
 				items: [
 					{ id_item: 'item_5', quantity: 1 }, // Mate de Calabaza
+				],
+			},
+		],
+	},
+	{
+		id_purchase_order:    'seed_order_reembolsado_2',
+		status:               OrderStatus.REEMBOLSADO,
+		total_price:          49300, // item_20(45000) + item_15(3800) + shipping(500)
+		id_payment_operation: 'pay_seed_reembolsado_2',
+		id_address:           'seed_addr_lp',
+		daysAgo:              35,
+		packages: [
+			{
+				id_package: 'seed_pkg_reembolsado_2a',
+				id_seller:  'seller_1',
+				items: [
+					{ id_item: 'item_20', quantity: 1 }, // Kit Premium Edición Limitada
+				],
+			},
+			{
+				id_package: 'seed_pkg_reembolsado_2b',
+				id_seller:  'seller_3',
+				items: [
+					{ id_item: 'item_15', quantity: 1 }, // Portamate de Cuero
 				],
 			},
 		],
@@ -103,9 +228,6 @@ const SEED_ORDERS = [
 ]
 
 export async function POST() {
-	if (process.env.NODE_ENV === 'production')
-		return new Response(null, { status: 404 })
-
 	const { userId } = await auth()
 	if (!userId)
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -116,59 +238,95 @@ export async function POST() {
 	})
 
 	if (!buyer)
-		return NextResponse.json({ error: 'Buyer not found. Log in first to auto-provision the account.' }, { status: 404 })
+		return NextResponse.json(
+			{ error: 'Buyer not found. Iniciá sesión en la app primero para crear tu perfil.' },
+			{ status: 404 },
+		)
 
-	// Delete previous seeded data in dependency order (items → packages → orders)
-	const seedPackageIds = SEED_ORDERS.flatMap(o => o.packages.map(p => p.id_package))
+	// Prefix all seed IDs with a buyer-specific slug so different users
+	// can each have their own copy of the seed data without collisions.
+	const prefix = buyer.id_buyer.slice(0, 8)
+	const p = (base: string) => `${prefix}_${base}`
 
-	await db.packageItem.deleteMany({
-		where: { id_package: { in: seedPackageIds } },
-	})
-	await db.package.deleteMany({
-		where: { id_package: { in: seedPackageIds } },
-	})
-	await db.purchaseOrder.deleteMany({
-		where: {
-			id_buyer: buyer.id_buyer,
-			id_purchase_order: { in: SEED_ORDERS.map(o => o.id_purchase_order) },
-		},
-	})
+	try {
+		// ── Cleanup in dependency order ─────────────────────────────────────────
+		const seedPackageIds = SEED_ORDERS.flatMap(o => o.packages.map(pk => p(pk.id_package)))
+		const seedOrderIds   = SEED_ORDERS.map(o => p(o.id_purchase_order))
+		const seedAddressIds = SEED_ADDRESSES.map(a => p(a.id_address))
 
-	// Create all orders
-	const now = new Date()
+		await db.packageItem.deleteMany({ where: { id_package: { in: seedPackageIds } } })
+		await db.package.deleteMany({ where: { id_package: { in: seedPackageIds } } })
+		await db.purchaseOrder.deleteMany({ where: { id_purchase_order: { in: seedOrderIds } } })
+		await db.address.deleteMany({ where: { id_address: { in: seedAddressIds } } })
 
-	await db.$transaction(
-		SEED_ORDERS.map(order =>
-			db.purchaseOrder.create({
+		// ── Create sequentially (PrismaNeon HTTP driver doesn't support ──────────
+		// ── interactive transactions, so we commit each step individually) ───────
+		const now = new Date()
+
+		// 1. Addresses
+		for (const addr of SEED_ADDRESSES) {
+			await db.address.create({
+				data: { ...addr, id_address: p(addr.id_address), id_buyer: buyer.id_buyer },
+			})
+		}
+
+		// 2. Orders
+		for (const order of SEED_ORDERS) {
+			await db.purchaseOrder.create({
 				data: {
-					id_purchase_order: order.id_purchase_order,
-					id_buyer: buyer.id_buyer,
-					total_price: order.total_price,
-					status: order.status,
-					id_payment_operation: order.id_payment_operation,
+					id_purchase_order:    p(order.id_purchase_order),
+					id_buyer:             buyer.id_buyer,
+					id_address:           p(order.id_address),
+					total_price:          order.total_price,
+					status:               order.status,
+					id_payment_operation: p(order.id_payment_operation),
 					created_at: new Date(now.getTime() - order.daysAgo * 24 * 60 * 60 * 1000),
-					packages: {
-						create: order.packages.map(pkg => ({
-							id_package: pkg.id_package,
-							id_seller: pkg.id_seller,
-							items: {
-								create: pkg.items,
-							},
-						})),
-					},
 				},
 			})
-		)
-	)
+		}
 
-	return NextResponse.json({
-		ok: true,
-		message: `${SEED_ORDERS.length} órdenes creadas.`,
-		orders: SEED_ORDERS.map(o => ({
-			id: o.id_purchase_order,
-			status: o.status,
-			total: o.total_price,
-			packages: o.packages.length,
-		})),
-	})
+		// 3. Packages
+		for (const order of SEED_ORDERS) {
+			for (const pkg of order.packages) {
+				await db.package.create({
+					data: {
+						id_package:        p(pkg.id_package),
+						id_purchase_order: p(order.id_purchase_order),
+						id_seller:         pkg.id_seller,
+					},
+				})
+			}
+		}
+
+		// 4. Package items
+		for (const order of SEED_ORDERS) {
+			for (const pkg of order.packages) {
+				for (const item of pkg.items) {
+					await db.packageItem.create({
+						data: {
+							id_package: p(pkg.id_package),
+							id_item:    item.id_item,
+							quantity:   item.quantity,
+						},
+					})
+				}
+			}
+		}
+
+		return NextResponse.json({
+			ok:      true,
+			message: `${SEED_ORDERS.length} órdenes creadas para el comprador (prefijo: ${prefix}).`,
+			orders:  SEED_ORDERS.map(o => ({
+				id:       p(o.id_purchase_order),
+				status:   o.status,
+				total:    o.total_price,
+				address:  p(o.id_address),
+				packages: o.packages.length,
+			})),
+		})
+	} catch (err) {
+		const message = err instanceof Error ? err.message : String(err)
+		console.error('[seed-orders]', message)
+		return NextResponse.json({ error: message }, { status: 500 })
+	}
 }

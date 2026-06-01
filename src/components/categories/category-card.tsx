@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
+import { getProductImage } from '@/lib/category-images'
 
 interface Props {
 	category_name: string
@@ -7,16 +9,34 @@ interface Props {
 }
 
 export default function CategoryCard({ category_name, item_count }: Props) {
+	const src = getProductImage(category_name, category_name)
+
 	return (
 		<Link
 			href={`/categorias/${encodeURIComponent(category_name)}`}
 			className="group flex flex-col cursor-pointer"
 		>
-			{/* Image placeholder */}
-			<div className="relative overflow-hidden rounded-xl border border-outline-variant aspect-[4/5] bg-surface-container flex items-center justify-center border border-outline-variant hover:border-primary hover:shadow-md transition-all duration-200">
-				<span className="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">
-					{category_name[0]}
-				</span>
+			{/* Image */}
+			<div className="relative overflow-hidden rounded-xl border border-outline-variant aspect-[4/5] bg-surface-container hover:border-primary hover:shadow-md transition-all duration-200">
+				{src ? (
+					<Image
+						src={src}
+						alt={category_name}
+						fill
+						className="object-cover group-hover:scale-105 transition-transform duration-300"
+						sizes="(max-width: 640px) 50vw, 25vw"
+					/>
+				) : (
+					<div
+						role="img"
+						aria-label={`Imagen de ${category_name} (sin foto)`}
+						className="w-full h-full flex items-center justify-center"
+					>
+						<span aria-hidden="true" className="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">
+							{category_name[0]}
+						</span>
+					</div>
+				)}
 			</div>
 
 			{/* Label */}
