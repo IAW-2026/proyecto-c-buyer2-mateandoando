@@ -14,8 +14,8 @@ Permite a los compradores explorar el catálogo de mates y accesorios, gestionar
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Comprador | buyer_user@mail.com | `buyer_Passw0rd!_user` |
-| Administrador | admin-buyer@mail.com | `buyer_Passw0rd!_admin` |
+| Comprador | buyer+clerktest@iaw.com| `iawuser#` |
+| Admin | buyer-admin+clerktest@iaw.com| `iawuser#` |
 
 El **comprador** puede navegar el catálogo, agregar productos al carrito, hacer checkout y consultar el historial y seguimiento de sus compras.
 
