@@ -39,6 +39,14 @@ export default async function SeguimientoPage({
 					id_buyer: true,
 					total_price: true,
 					id_purchase_order: true,
+					address: {
+						select: {
+							street:   true,
+							floor_apt: true,
+							city:     true,
+							province: true,
+						},
+					},
 				},
 			},
 		},
@@ -129,6 +137,7 @@ export default async function SeguimientoPage({
 						productsSubtotal={productsSubtotal}
 						shippingCost={shippingCost}
 						orderTotal={orderTotal}
+						address={orderPackage.order.address ?? undefined}
 					/>
 				</div>
 

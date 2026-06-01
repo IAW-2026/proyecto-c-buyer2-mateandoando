@@ -62,47 +62,52 @@ export async function POST(req: NextRequest) {
 		token ?? undefined,
 	)
 
-	// 3. Persist PurchaseOrder + Packages + Address in a single transaction
-	await db.$transaction([
-		db.purchaseOrder.create({
+	// 3. Persist Address → PurchaseOrder → Packages in a single transaction
+	//    Address is created first so its id can be linked to the order.
+	await db.$transaction(async tx => {
+		const savedAddress = await tx.address.create({
 			data: {
-				id_purchase_order: purchaseOrder.id_purchase_order,
 				id_buyer,
-				total_price: totalWithShipping,
-				status: 'PENDIENTE',
+				alias: 'Envío',
+				street:   address.street,
+				floor_apt: address.floor_apt ?? null,
+				city:     address.city,
+				province: address.province,
+				zip_code: address.zip_code,
+			},
+		})
+
+		await tx.purchaseOrder.create({
+			data: {
+				id_purchase_order:    purchaseOrder.id_purchase_order,
+				id_buyer,
+				id_address:           savedAddress.id_address,
+				total_price:          totalWithShipping,
+				status:               'PENDIENTE',
 				id_payment_operation: payment.id_payment_operation,
 			},
-		}),
-		...purchaseOrder.packages.map(pkg =>
-			db.package.create({
+		})
+
+		for (const pkg of purchaseOrder.packages) {
+			await tx.package.create({
 				data: {
-					id_package: pkg.id_package,
+					id_package:        pkg.id_package,
 					id_purchase_order: purchaseOrder.id_purchase_order,
-					id_seller: pkg.id_seller,
+					id_seller:         pkg.id_seller,
 					items: {
 						create: pkg.items.map((pkgItem: { id_item: string; quantity: number }) => ({
-							id_item: pkgItem.id_item,
+							id_item:  pkgItem.id_item,
 							quantity: pkgItem.quantity,
 						})),
 					},
 				},
 			})
-		),
-		db.address.create({
-			data: {
-				id_buyer,
-				alias: 'Envío',
-				street: address.street,
-				floor_apt: address.floor_apt ?? null,
-				city: address.city,
-				province: address.province,
-				zip_code: address.zip_code,
-			},
-		}),
-		db.cartItem.deleteMany({
+		}
+
+		await tx.cartItem.deleteMany({
 			where: { cart: { id_buyer } },
-		}),
-	])
+		})
+	})
 
 	return NextResponse.json({
 		checkout_url: payment.checkout_url,
