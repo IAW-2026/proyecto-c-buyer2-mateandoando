@@ -13,11 +13,10 @@ export default function CategoryCard({ category_name, item_count }: Props) {
 			className="group flex flex-col cursor-pointer"
 		>
 			{/* Image placeholder */}
-			<div className="relative overflow-hidden rounded-xl border border-outline-variant aspect-[4/5] bg-surface-container flex items-center justify-center">
+			<div className="relative overflow-hidden rounded-xl border border-outline-variant aspect-[4/5] bg-surface-container flex items-center justify-center border border-outline-variant hover:border-primary hover:shadow-md transition-all duration-200">
 				<span className="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">
 					{category_name[0]}
 				</span>
-				<div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 			</div>
 
 			{/* Label */}
@@ -25,11 +24,7 @@ export default function CategoryCard({ category_name, item_count }: Props) {
 				<h2 className="text-headline-md font-headline-md text-on-surface">
 					{category_name}
 				</h2>
-				<ArrowRight
-					size={20}
-					aria-hidden="true"
-					className="text-primary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200"
-				/>
+				<ArrowRight size={20} aria-hidden="true" className="text-primary" />
 			</div>
 
 			<p className="text-body-sm text-on-surface-variant">
