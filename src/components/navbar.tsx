@@ -2,14 +2,25 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ShoppingCart } from 'lucide-react'
 import { useAuth, useUser, SignInButton, UserButton } from '@clerk/nextjs'
 import { useCartStore } from '@/store/cart-store'
 
 export default function Navbar() {
+	const pathname = usePathname()
 	const { isSignedIn } = useAuth()
 	const { user } = useUser()
 	const isAdmin = user?.publicMetadata?.role === 'admin-buyer'
+
+	function navLinkClass(href: string) {
+		const isActive = pathname.startsWith(href)
+		return `transition-colors ${
+			isActive
+				? 'text-primary underline underline-offset-8 decoration-2 decoration-gray-400'
+				: 'hover:text-primary'
+		}`
+	}
 	const count = useCartStore(s => s.count)
 	const setCount = useCartStore(s => s.setCount)
 
@@ -34,13 +45,13 @@ export default function Navbar() {
 				</Link>
 
 				<nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
-					<Link href="/categorias" className="hover:text-primary transition-colors">Categorías</Link>
-					<Link href="/vendedores" className="hover:text-primary transition-colors">Vendedores</Link>
+					<Link href="/categorias" className={navLinkClass('/categorias')}>Categorías</Link>
+					<Link href="/vendedores" className={navLinkClass('/vendedores')}>Vendedores</Link>
 					{isSignedIn && (
-						<Link href="/mis-compras" className="hover:text-primary transition-colors">Mis Compras</Link>
+						<Link href="/mis-compras" className={navLinkClass('/mis-compras')}>Mis Compras</Link>
 					)}
 					{isAdmin && (
-						<Link href="/admin" className="hover:text-primary transition-colors">Admin</Link>
+						<Link href="/admin" className={navLinkClass('/admin')}>Admin</Link>
 					)}
 				</nav>
 

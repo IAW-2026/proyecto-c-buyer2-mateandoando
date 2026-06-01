@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { sellerService } from '@/services/seller'
 import ProductCard from '@/components/product-card'
 import SearchControls from '@/components/search-controls'
+import Pagination from '@/components/pagination'
 
 const PAGE_SIZE = 12
 
@@ -71,7 +72,7 @@ export default async function HomePage({ searchParams }: Props) {
 
 			{/* Search + order-by */}
 			<div className="mb-8">
-				<SearchControls key={`${textQuery}-${order}`} textQuery={textQuery} order={order} />
+				<SearchControls key={`${textQuery}-${order}`} textQuery={textQuery} order={order} basePath="/" />
 			</div>
 
 			{/* Products */}
@@ -112,39 +113,12 @@ export default async function HomePage({ searchParams }: Props) {
 				)}
 
 				{/* Pagination */}
-				{totalPages > 1 && (
-					<div className="flex items-center justify-center gap-4 mt-10">
-						{safePage > 1 ? (
-							<Link
-								href={buildPageUrl(safePage - 1)}
-								className="px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors"
-							>
-								← Anterior
-							</Link>
-						) : (
-							<span className="px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface-variant opacity-40 cursor-not-allowed">
-								← Anterior
-							</span>
-						)}
-
-						<span className="text-sm text-on-surface-variant">
-							Página {safePage} de {totalPages}
-						</span>
-
-						{safePage < totalPages ? (
-							<Link
-								href={buildPageUrl(safePage + 1)}
-								className="px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors"
-							>
-								Siguiente →
-							</Link>
-						) : (
-							<span className="px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface-variant opacity-40 cursor-not-allowed">
-								Siguiente →
-							</span>
-						)}
-					</div>
-				)}
+				<Pagination
+					currentPage={safePage}
+					totalPages={totalPages}
+					prevUrl={buildPageUrl(safePage - 1)}
+					nextUrl={buildPageUrl(safePage + 1)}
+				/>
 			</section>
 		</>
 	)

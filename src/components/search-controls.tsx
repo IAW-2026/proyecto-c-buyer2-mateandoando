@@ -1,49 +1,74 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, ChevronDown } from 'lucide-react'
+import { Search, X, ChevronDown, Loader2 } from 'lucide-react'
 
-interface Props {
-	textQuery?: string
-	order?: string
+interface OrderOption {
+	value: string
+	label: string
 }
 
-export default function SearchControls({ textQuery = '', order = '' }: Props) {
+const DEFAULT_ORDER_OPTIONS: OrderOption[] = [
+	{ value: 'price_asc',  label: 'Menor precio' },
+	{ value: 'price_desc', label: 'Mayor precio' },
+]
+
+interface Props {
+	textQuery?:    string
+	order?:        string
+	orderOptions?: OrderOption[]
+	basePath?:     string
+}
+
+export default function SearchControls({
+	textQuery    = '',
+	order        = '',
+	orderOptions = DEFAULT_ORDER_OPTIONS,
+	basePath     = '/',
+}: Props) {
 	const router = useRouter()
+	const [isPending, startTransition] = useTransition()
 	const [inputValue, setInputValue] = useState(textQuery)
 
-	function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-		e.preventDefault()
-		const data = new FormData(e.currentTarget)
+	function navigate(url: string) {
+		startTransition(() => router.push(url))
+	}
+
+	function buildUrl(query: string, order: string, page?: number) {
 		const params = new URLSearchParams()
-		const query = data.get('textQuery')?.toString().trim()
-		const orderValue = data.get('order')?.toString()
+		
+		if (query.trim())
+			params.set('textQuery', query.trim())
 
-		if (query)
-			params.set('textQuery', query)
+		if (order)
+			params.set('order', order)
 
-		if (orderValue)
-			params.set('order', orderValue)
+		if (page && page > 1)
+			params.set('page', String(page))
 
 		const queryString = params.toString()
-		router.push(queryString ? `/?${queryString}` : '/')
+
+		return queryString ? `${basePath}?${queryString}` : basePath
+	}
+
+	function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+		e.preventDefault()
+
+		const data = new FormData(e.currentTarget)
+		const query = data.get('textQuery')?.toString() ?? ''
+		const order = data.get('order')?.toString() ?? ''
+
+		navigate(buildUrl(query, order))
 	}
 
 	function handleClear() {
 		setInputValue('')
-		const params = new URLSearchParams()
-		if (order) params.set('order', order)
-		const qs = params.toString()
-		router.push(qs ? `/?${qs}` : '/')
+		navigate(buildUrl('', order))
 	}
 
 	function handleOrderChange(e: React.ChangeEvent<HTMLSelectElement>) {
-		const params = new URLSearchParams()
-		if (inputValue.trim()) params.set('textQuery', inputValue.trim())
-		if (e.target.value) params.set('order', e.target.value)
-		const qs = params.toString()
-		router.push(qs ? `/?${qs}` : '/')
+		navigate(buildUrl(inputValue, e.target.value))
 	}
 
 	return (
@@ -55,7 +80,7 @@ export default function SearchControls({ textQuery = '', order = '' }: Props) {
 					type="text"
 					value={inputValue}
 					onChange={(e) => setInputValue(e.target.value)}
-					placeholder="Buscar productos..."
+					placeholder="Buscar..."
 					className={`w-full border border-outline-variant rounded-lg bg-surface-container-low px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary ${inputValue ? 'pr-20' : 'pr-12'}`}
 				/>
 
@@ -75,9 +100,13 @@ export default function SearchControls({ textQuery = '', order = '' }: Props) {
 				<button
 					type="submit"
 					aria-label="Buscar"
-					className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+					disabled={isPending}
+					className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50"
 				>
-					<Search size={18} aria-hidden="true" />
+					{isPending
+						? <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+						: <Search size={18} aria-hidden="true" />
+					}
 				</button>
 			</div>
 
@@ -90,8 +119,9 @@ export default function SearchControls({ textQuery = '', order = '' }: Props) {
 					className="appearance-none border border-outline-variant rounded-lg bg-surface-container-low pl-3 pr-10 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer h-full"
 				>
 					<option value="">Ordenar por</option>
-					<option value="price_asc">Menor precio</option>
-					<option value="price_desc">Mayor precio</option>
+					{orderOptions.map(opt => (
+						<option key={opt.value} value={opt.value}>{opt.label}</option>
+					))}
 				</select>
 				<ChevronDown
 					size={16}

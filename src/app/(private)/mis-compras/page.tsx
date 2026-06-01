@@ -1,10 +1,28 @@
+import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import EmptyOrders from '@/components/orders/empty-orders'
 import OrderRow from '@/components/orders/order-row'
+import SearchControls from '@/components/search-controls'
+import Pagination from '@/components/pagination'
 
-export default async function MisComprasPage() {
+const PAGE_SIZE = 10
+
+const ORDER_OPTIONS = [
+	{ value: 'newest',     label: 'Más recientes' },
+	{ value: 'oldest',     label: 'Más antiguas'  },
+	{ value: 'price_asc',  label: 'Menor precio'  },
+	{ value: 'price_desc', label: 'Mayor precio'  },
+]
+
+interface Props {
+	searchParams: Promise<{ textQuery?: string; order?: string; page?: string }>
+}
+
+export default async function MisComprasPage({ searchParams }: Props) {
 	const { userId } = await auth()
+	const { textQuery = '', order = '', page = '1' } = await searchParams
+	const currentPage = Math.max(1, parseInt(page, 10) || 1)
 
 	const buyer = await db.buyer.findUnique({
 		where: { clerk_user_id: userId! },
@@ -19,15 +37,47 @@ export default async function MisComprasPage() {
 		)
 	}
 
-	const orders = await db.purchaseOrder.findMany({
+	const allOrders = await db.purchaseOrder.findMany({
 		where: { id_buyer: buyer.id_buyer },
 		include: {
 			packages: {
 				include: { items: true },
 			},
 		},
-		orderBy: { created_at: 'desc' },
 	})
+
+	// Filter by search query — matches order ID or status
+	const query = textQuery.trim().toLowerCase()
+	const filtered = query
+		? allOrders.filter(o =>
+			o.id_purchase_order.toLowerCase().includes(query) ||
+			o.status.toLowerCase().includes(query)
+		)
+		: allOrders
+
+	// Sort
+	const sorted = [...filtered].sort((a, b) => {
+		if (order === 'oldest')     return a.created_at.getTime() - b.created_at.getTime()
+		if (order === 'price_asc')  return Number(a.total_price) - Number(b.total_price)
+		if (order === 'price_desc') return Number(b.total_price) - Number(a.total_price)
+		// default: newest first
+		return b.created_at.getTime() - a.created_at.getTime()
+	})
+
+	// Paginate
+	const totalOrders = sorted.length
+	const totalPages  = Math.max(1, Math.ceil(totalOrders / PAGE_SIZE))
+	const safePage    = Math.min(currentPage, totalPages)
+	const orders      = sorted.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
+	function buildPageUrl(p: number) {
+		const params = new URLSearchParams()
+		if (textQuery) params.set('textQuery', textQuery)
+		if (order)     params.set('order', order)
+		if (p > 1)     params.set('page', String(p))
+		const qs = params.toString()
+		return qs ? `/mis-compras?${qs}` : '/mis-compras'
+	}
 
 	return (
 		<>
@@ -40,21 +90,62 @@ export default async function MisComprasPage() {
 				</p>
 			</section>
 
-			{orders.length === 0
-				? <EmptyOrders />
-				: <div className="flex flex-col divide-y divide-outline-variant">
-					{orders.map(order => (
-						<OrderRow
-							key={order.id_purchase_order}
-							id_purchase_order={order.id_purchase_order}
-							created_at={order.created_at}
-							total_price={Number(order.total_price)}
-							status={order.status}
-							packages={order.packages}
-						/>
-					))}
-				</div>
-			}
+			{/* Search + order-by */}
+			<div className="mb-8">
+				<SearchControls
+					key={`${textQuery}-${order}`}
+					textQuery={textQuery}
+					order={order}
+					orderOptions={ORDER_OPTIONS}
+					basePath="/mis-compras"
+				/>
+			</div>
+
+			{allOrders.length === 0 ? (
+				<EmptyOrders />
+			) : (
+				<>
+					{/* Results count */}
+					<div className="flex items-center justify-between mb-4">
+						<span className="text-label-sm text-on-surface-variant">
+							{totalOrders} {totalOrders === 1 ? 'orden' : 'órdenes'}
+						</span>
+					</div>
+
+					{orders.length === 0 ? (
+						<div className="flex flex-col items-center justify-center py-20 gap-4 text-on-surface-variant">
+							<p className="text-body-md">No se encontraron órdenes.</p>
+							
+							{textQuery && (
+								<Link href="/mis-compras" className="text-sm text-primary hover:underline">
+									Ver todas las compras
+								</Link>
+							)}
+						</div>
+					) : (
+						<div className="flex flex-col divide-y divide-outline-variant">
+							{orders.map(order => (
+								<OrderRow
+									key={order.id_purchase_order}
+									id_purchase_order={order.id_purchase_order}
+									created_at={order.created_at}
+									total_price={Number(order.total_price)}
+									status={order.status}
+									packages={order.packages}
+								/>
+							))}
+						</div>
+					)}
+
+					{/* Pagination */}
+					<Pagination
+						currentPage={safePage}
+						totalPages={totalPages}
+						prevUrl={buildPageUrl(safePage - 1)}
+						nextUrl={buildPageUrl(safePage + 1)}
+					/>
+				</>
+			)}
 		</>
 	)
 }
