@@ -1,6 +1,7 @@
 import './ui/globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Manrope, Inter } from 'next/font/google'
+import NavigationProgress from '@/components/navigation-progress'
 
 const manrope = Manrope({
       subsets: ['latin'],
@@ -20,7 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       return (
               <ClerkProvider>
                       <html lang="es" className={`${manrope.variable} ${inter.variable}`}>
-                              <body>{children}</body>
+                              <body>
+                                <NavigationProgress />
+                                {children}
+                        </body>
                       </html>
               </ClerkProvider>
       )

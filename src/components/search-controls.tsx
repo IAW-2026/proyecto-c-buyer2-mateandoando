@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, ChevronDown } from 'lucide-react'
+import { Search, X, ChevronDown, Loader2 } from 'lucide-react'
 
 interface OrderOption {
 	value: string
@@ -28,7 +28,12 @@ export default function SearchControls({
 	basePath     = '/',
 }: Props) {
 	const router = useRouter()
+	const [isPending, startTransition] = useTransition()
 	const [inputValue, setInputValue] = useState(textQuery)
+
+	function navigate(url: string) {
+		startTransition(() => router.push(url))
+	}
 
 	function buildUrl(query: string, order: string, page?: number) {
 		const params = new URLSearchParams()
@@ -54,16 +59,16 @@ export default function SearchControls({
 		const query = data.get('textQuery')?.toString() ?? ''
 		const order = data.get('order')?.toString() ?? ''
 
-		router.push(buildUrl(query, order))
+		navigate(buildUrl(query, order))
 	}
 
 	function handleClear() {
 		setInputValue('')
-		router.push(buildUrl('', order))
+		navigate(buildUrl('', order))
 	}
 
 	function handleOrderChange(e: React.ChangeEvent<HTMLSelectElement>) {
-		router.push(buildUrl(inputValue, e.target.value))
+		navigate(buildUrl(inputValue, e.target.value))
 	}
 
 	return (
@@ -95,9 +100,13 @@ export default function SearchControls({
 				<button
 					type="submit"
 					aria-label="Buscar"
-					className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
+					disabled={isPending}
+					className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50"
 				>
-					<Search size={18} aria-hidden="true" />
+					{isPending
+						? <Loader2 size={18} className="animate-spin" aria-hidden="true" />
+						: <Search size={18} aria-hidden="true" />
+					}
 				</button>
 			</div>
 

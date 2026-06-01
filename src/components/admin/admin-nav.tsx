@@ -13,7 +13,7 @@ export default function AdminNav() {
 	const pathname = usePathname()
 
 	return (
-		<aside className="w-64 flex-shrink-0 bg-surface-container-low border-r border-outline-variant flex flex-col min-h-screen">
+		<aside className="w-64 flex-shrink-0 bg-surface-container-low border-r border-outline-variant flex flex-col">
 			<div className="h-16 flex items-center px-6 border-b border-outline-variant">
 				<span className="font-semibold text-primary text-lg">🧉 Admin</span>
 			</div>
