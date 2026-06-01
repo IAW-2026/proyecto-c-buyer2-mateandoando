@@ -120,6 +120,9 @@
 	body {
 		@apply bg-surface text-on-surface;
 	}
+	*:focus-visible {
+		@apply outline-2 outline-offset-2 outline-primary;
+	}
 }
 
 @keyframes nav-bar {

@@ -6,77 +6,83 @@ import { useClerk } from '@clerk/nextjs'
 import { useCartStore } from '@/store/cart-store'
 
 interface Props {
-    id_item: string
+	id_item: string
 }
 
 type State = 'idle' | 'loading' | 'added' | 'error'
 
 export default function AddToCartButton({ id_item }: Props) {
-    const [state, setState] = useState<State>('idle')
-    const { openSignIn } = useClerk()
-    const increment = useCartStore(s => s.increment)
+	const [state, setState] = useState<State>('idle')
+	const { openSignIn } = useClerk()
+	const increment = useCartStore(s => s.increment)
 
-    const config = {
-        idle: {
-            label: 'Agregar al carrito',
-            icon: <ShoppingCart size={20} />,
-            className: 'bg-primary-container text-on-primary hover:opacity-90',
-        },
-        loading: {
-            label: 'Agregando...',
-            icon: <Loader2 size={20} className="animate-spin" />,
-            className: 'bg-primary-container text-on-primary-fixed opacity-70 cursor-not-allowed',
-        },
-        added: {
-            label: 'Agregado',
-            icon: <Check size={20} />,
-            className: 'bg-surface-container text-primary',
-        },
-        error: {
-            label: 'Error al agregar',
-            icon: <AlertCircle size={20} />,
-            className: 'bg-error-container text-on-error-container',
-        },
-    }
+	const config = {
+		idle: {
+			label: 'Agregar al carrito',
+			icon: <ShoppingCart size={20} aria-hidden="true" />,
+			className: 'bg-primary-container text-on-primary hover:opacity-90',
+		},
+		loading: {
+			label: 'Agregando...',
+			icon: <Loader2 size={20} aria-hidden="true" className="animate-spin" />,
+			className: 'bg-primary-container text-on-primary-fixed opacity-70 cursor-not-allowed',
+		},
+		added: {
+			label: 'Agregado',
+			icon: <Check size={20} aria-hidden="true" />,
+			className: 'bg-surface-container text-primary',
+		},
+		error: {
+			label: 'Error al agregar',
+			icon: <AlertCircle size={20} aria-hidden="true" />,
+			className: 'bg-error-container text-on-error-container',
+		},
+	}
 
-    const { label, icon, className } = config[state]
+	const { label, icon, className } = config[state]
 
-    async function handleClick() {
-        setState('loading')
+	async function handleClick() {
+		setState('loading')
 
-        try {
-            const res = await fetch('/api/cart/items', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id_item, quantity: 1 }),
-            })
+		try {
+			const res = await fetch('/api/cart/items', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id_item, quantity: 1 }),
+			})
 
-            if (res.status === 401) {
-                setState('idle')
-                openSignIn()
-                return
-            }
+			if (res.status === 401) {
+				setState('idle')
+				openSignIn()
+				return
+			}
 
-            if (!res.ok)
-                throw new Error()
+			if (!res.ok)
+				throw new Error()
 
-            increment()
-            setState('added')
-            setTimeout(() => setState('idle'), 2000)
-        } catch {
-            setState('error')
-            setTimeout(() => setState('idle'), 2000)
-        }
-    }
+			increment()
+			setState('added')
+			setTimeout(() => setState('idle'), 2000)
+		} catch {
+			setState('error')
+			setTimeout(() => setState('idle'), 2000)
+		}
+	}
 
-    return (
-        <button
-            onClick={handleClick}
-            disabled={state === 'loading' || state === 'added'}
-            className={`w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}`}
-        >
-            {icon}
-            {label}
-        </button>
-    )
+	return (
+		<>
+			<button
+				onClick={handleClick}
+				disabled={state === 'loading' || state === 'added'}
+				aria-busy={state === 'loading'}
+				className={`w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md transition-all duration-200 ${className}`}
+			>
+				{icon}
+				{label}
+			</button>
+			<span role="status" aria-live="polite" className="sr-only">
+				{state === 'added' ? 'Producto agregado al carrito' : state === 'error' ? 'Error al agregar al carrito' : ''}
+			</span>
+		</>
+	)
 }

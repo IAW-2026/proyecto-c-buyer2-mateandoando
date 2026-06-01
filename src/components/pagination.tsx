@@ -7,8 +7,8 @@ interface Props {
 	nextUrl:     string
 }
 
-const LINK_CLASS = 'px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors'
-const DISABLED_CLASS = 'px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface-variant opacity-40 cursor-not-allowed'
+const LINK_CLASS     = 'px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container transition-colors'
+const DISABLED_CLASS = 'px-4 py-2 text-sm font-medium border border-outline-variant rounded-lg text-on-surface-variant cursor-not-allowed'
 
 export default function Pagination({ currentPage, totalPages, prevUrl, nextUrl }: Props) {
 	if (totalPages <= 1) return null
@@ -17,7 +17,7 @@ export default function Pagination({ currentPage, totalPages, prevUrl, nextUrl }
 		<div className="flex items-center justify-center gap-4 mt-10">
 			{currentPage > 1
 				? <Link href={prevUrl} className={LINK_CLASS}>← Anterior</Link>
-				: <span className={DISABLED_CLASS}>← Anterior</span>
+				: <button disabled className={DISABLED_CLASS}>← Anterior</button>
 			}
 
 			<span className="text-sm text-on-surface-variant">
@@ -26,7 +26,7 @@ export default function Pagination({ currentPage, totalPages, prevUrl, nextUrl }
 
 			{currentPage < totalPages
 				? <Link href={nextUrl} className={LINK_CLASS}>Siguiente →</Link>
-				: <span className={DISABLED_CLASS}>Siguiente →</span>
+				: <button disabled className={DISABLED_CLASS}>Siguiente →</button>
 			}
 		</div>
 	)

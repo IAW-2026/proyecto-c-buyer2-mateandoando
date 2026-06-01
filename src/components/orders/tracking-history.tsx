@@ -26,7 +26,7 @@ export default function TrackingHistory({ history }: Props) {
 			<div className="flex flex-col gap-3">
 				{history.map((event, index) => (
 					<div key={index} className="flex gap-4 items-start">
-						<div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+						<div aria-hidden="true" className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
 						<div className="flex flex-col gap-0.5">
 							<p className="text-body-md text-on-surface font-medium">
 								{event.event}
