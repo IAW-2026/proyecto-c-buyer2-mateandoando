@@ -18,7 +18,7 @@ export default function Navbar() {
 		return `transition-colors ${
 			isActive
 				? 'text-primary underline underline-offset-8 decoration-2 decoration-gray-400'
-				: 'hover:text-primary'
+				: 'text-on-surface hover:text-primary'
 		}`
 	}
 	const count = useCartStore(s => s.count)
@@ -44,7 +44,7 @@ export default function Navbar() {
 					MateandoAndo
 				</Link>
 
-				<nav className="hidden md:flex gap-8 text-sm text-on-surface-variant">
+				<nav className="hidden md:flex gap-8 text-sm">
 					<Link href="/categorias" className={navLinkClass('/categorias')}>Categorías</Link>
 					<Link href="/vendedores" className={navLinkClass('/vendedores')}>Vendedores</Link>
 					{isSignedIn && (
@@ -56,14 +56,20 @@ export default function Navbar() {
 				</nav>
 
 				<div className="flex items-center gap-4">
-					<Link href="/carrito" className="relative text-on-surface hover:text-primary transition-colors">
-						<ShoppingCart size={22} />
-						{count > 0 && (
-							<span className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">
-								{count > 99 ? '99+' : count}
-							</span>
-						)}
-					</Link>
+					<div role="status" aria-live="polite" aria-atomic="true">
+						<Link
+							href="/carrito"
+							aria-label={count > 0 ? `Carrito, ${count} ${count === 1 ? 'producto' : 'productos'}` : 'Carrito'}
+							className="relative text-on-surface hover:text-primary transition-colors"
+						>
+							<ShoppingCart size={22} aria-hidden="true" />
+							{count > 0 && (
+								<span aria-hidden="true" className="absolute -top-2 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-primary text-on-primary text-[10px] font-bold flex items-center justify-center leading-none">
+									{count > 99 ? '99+' : count}
+								</span>
+							)}
+						</Link>
+					</div>
 
 					{isSignedIn ? (
 						<UserButton />

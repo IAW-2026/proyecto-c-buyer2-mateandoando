@@ -22,11 +22,12 @@ export default function CategoryCard({ category_name, item_count }: Props) {
 
 			{/* Label */}
 			<div className="mt-3 flex justify-between items-center">
-				<h3 className="text-headline-md font-headline-md text-on-surface">
+				<h2 className="text-headline-md font-headline-md text-on-surface">
 					{category_name}
-				</h3>
+				</h2>
 				<ArrowRight
 					size={20}
+					aria-hidden="true"
 					className="text-primary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200"
 				/>
 			</div>

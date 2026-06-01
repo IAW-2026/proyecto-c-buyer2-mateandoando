@@ -11,7 +11,7 @@ const ORDER_STATUS_STYLE: Record<string, string> = {
 	PENDIENTE:   'bg-secondary-container text-on-secondary-container',
 	APROBADO:    'bg-primary-container text-on-primary-container',
 	RECHAZADO:   'bg-error-container text-on-error-container',
-	REEMBOLSADO: 'bg-surface-container-high text-on-surface-variant',
+	REEMBOLSADO: 'bg-surface-container-high text-on-surface',
 }
 
 export default async function BuyerDetailPage({ params }: Props) {

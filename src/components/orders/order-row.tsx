@@ -91,6 +91,7 @@ export default function OrderRow({
 				{firstPackageId ? (
 					<Link
 						href={`/mis-compras/${firstPackageId}/seguimiento`}
+						aria-label={`Ver detalle del pedido #${id_purchase_order.slice(0, 8).toUpperCase()}`}
 						className="block text-center w-full border border-outline-variant text-on-surface px-5 py-2 rounded-lg text-body-sm font-medium hover:bg-surface-container transition-colors"
 					>
 						Ver detalle

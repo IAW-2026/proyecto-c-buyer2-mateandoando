@@ -90,7 +90,7 @@ export default function SearchControls({
 						type="button"
 						onClick={handleClear}
 						aria-label="Limpiar búsqueda"
-						className="absolute right-10 top-1/2 -translate-y-1/2 text-error hover:opacity-70 transition-opacity"
+						className="absolute right-10 top-1/2 -translate-y-1/2 p-1.5 text-error hover:opacity-70 transition-opacity"
 					>
 						<X size={16} aria-hidden="true" />
 					</button>
@@ -101,7 +101,7 @@ export default function SearchControls({
 					type="submit"
 					aria-label="Buscar"
 					disabled={isPending}
-					className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50"
+					className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-on-surface-variant hover:text-primary transition-colors disabled:opacity-50"
 				>
 					{isPending
 						? <Loader2 size={18} className="animate-spin" aria-hidden="true" />
@@ -114,6 +114,7 @@ export default function SearchControls({
 			<div className="relative">
 				<select
 					name="order"
+					aria-label="Ordenar resultados"
 					defaultValue={order}
 					onChange={handleOrderChange}
 					className="appearance-none border border-outline-variant rounded-lg bg-surface-container-low pl-3 pr-10 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer h-full"

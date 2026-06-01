@@ -40,12 +40,15 @@ export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, erro
 
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div className="flex flex-col gap-1 sm:col-span-2">
-						<label className="text-label-md text-on-surface-variant">
+						<label htmlFor="address-street" className="text-label-md text-on-surface-variant">
 							Calle
 						</label>
 						<input
+							id="address-street"
 							type="text"
 							required
+							aria-required="true"
+							autoComplete="street-address"
 							value={address.street}
 							onChange={event => setAddress(prev => ({ ...prev, street: event.target.value }))}
 							placeholder="Av. Corrientes"
@@ -54,11 +57,13 @@ export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, erro
 					</div>
 
 					<div className="flex flex-col gap-1">
-						<label className="text-label-md text-on-surface-variant">
+						<label htmlFor="address-floor" className="text-label-md text-on-surface-variant">
 							Piso / Dpto (opcional)
 						</label>
 						<input
+							id="address-floor"
 							type="text"
+							autoComplete="address-line2"
 							value={address.floor_apt}
 							onChange={event => setAddress(prev => ({ ...prev, floor_apt: event.target.value }))}
 							placeholder="3° B"
@@ -67,31 +72,36 @@ export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, erro
 					</div>
 
 					<div className="flex flex-col gap-1">
-						<label className="text-label-md text-on-surface-variant">
+						<label htmlFor="address-zip" className="text-label-md text-on-surface-variant">
 							Código postal
 						</label>
 						<input
+							id="address-zip"
 							type="text"
 							required
+							aria-required="true"
+							autoComplete="postal-code"
+							inputMode="numeric"
 							value={address.zip_code}
-							onChange={
-								event => {
-											setAddress(prev => ({ ...prev, zip_code: event.target.value }))
-											onZipCodeChange(event.target.value)
-										}	
-							}
+							onChange={event => {
+								setAddress(prev => ({ ...prev, zip_code: event.target.value }))
+								onZipCodeChange(event.target.value)
+							}}
 							placeholder="1043"
 							className="border border-outline-variant rounded-lg px-4 py-3 text-body-md bg-surface text-on-surface focus:outline-none focus:border-primary"
 						/>
 					</div>
 
 					<div className="flex flex-col gap-1">
-						<label className="text-label-md text-on-surface-variant">
+						<label htmlFor="address-city" className="text-label-md text-on-surface-variant">
 							Ciudad
 						</label>
 						<input
+							id="address-city"
 							type="text"
 							required
+							aria-required="true"
+							autoComplete="address-level2"
 							value={address.city}
 							onChange={event => setAddress(prev => ({ ...prev, city: event.target.value }))}
 							placeholder="Buenos Aires"
@@ -100,12 +110,15 @@ export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, erro
 					</div>
 
 					<div className="flex flex-col gap-1 sm:col-span-2">
-						<label className="text-label-md text-on-surface-variant">
+						<label htmlFor="address-province" className="text-label-md text-on-surface-variant">
 							Provincia
 						</label>
 						<input
+							id="address-province"
 							type="text"
 							required
+							aria-required="true"
+							autoComplete="address-level1"
 							value={address.province}
 							onChange={event => setAddress(prev => ({ ...prev, province: event.target.value }))}
 							placeholder="CABA"
@@ -115,11 +128,11 @@ export default function AddressForm({ onSubmit, onZipCodeChange, isLoading, erro
 				</div>
 			</div>
 
-			{errorMessage && (
-				<p className="text-body-sm text-error">
-					{errorMessage}
-				</p>
-			)}
+			<div role="alert" aria-live="assertive">
+				{errorMessage && (
+					<p className="text-body-sm text-error">{errorMessage}</p>
+				)}
+			</div>
 
 			<button
 				type="submit"
