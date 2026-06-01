@@ -62,8 +62,7 @@ export async function POST(req: NextRequest) {
 		token ?? undefined,
 	)
 
-	// 3. Persist Address → PurchaseOrder → Packages in a single transaction
-	//    Address is created first so its id can be linked to the order.
+	// 3. Persist Address, PurchaseOrder and Packages in a single transaction
 	await db.$transaction(async tx => {
 		const savedAddress = await tx.address.create({
 			data: {
