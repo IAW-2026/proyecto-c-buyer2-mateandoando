@@ -1,12 +1,12 @@
-import { auth } from '@clerk/nextjs/server'
+import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import AdminNav from '@/components/admin/admin-nav'
 
 export const metadata = { title: 'Admin — MateandoAndo' }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-	const { sessionClaims } = await auth()
-	const role = (sessionClaims?.publicMetadata as { role?: string })?.role
+	const user = await currentUser()
+	const role = user?.publicMetadata?.role
 
 	if (role !== 'admin-buyer') {
 		redirect('/')
