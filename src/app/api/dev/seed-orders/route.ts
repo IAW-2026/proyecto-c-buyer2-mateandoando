@@ -16,7 +16,7 @@ import { OrderStatus } from '@prisma/client'
 // item_13: 12000     (Kit Gaucho Completo,     0%)
 // item_14: 18700     (Termo Stanley XL 1.9L,   15%  → 22000×0.85)
 // item_15: 3800      (Portamate de Cuero,      0%)
-// item_17: 26250     (Kit Estancia Premium,    25%  → 35000×0.75)
+// item_20: 45000     (Kit Premium Edición Limitada, 0%)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SHIPPING = 500
@@ -204,7 +204,7 @@ const SEED_ORDERS = [
 	{
 		id_purchase_order:    'seed_order_reembolsado_2',
 		status:               OrderStatus.REEMBOLSADO,
-		total_price:          30550, // item_17(26250) + item_15(3800) + shipping(500)
+		total_price:          49300, // item_20(45000) + item_15(3800) + shipping(500)
 		id_payment_operation: 'pay_seed_reembolsado_2',
 		id_address:           'seed_addr_lp',
 		daysAgo:              35,
@@ -213,7 +213,7 @@ const SEED_ORDERS = [
 				id_package: 'seed_pkg_reembolsado_2a',
 				id_seller:  'seller_1',
 				items: [
-					{ id_item: 'item_17', quantity: 1 }, // Kit Estancia Premium
+					{ id_item: 'item_20', quantity: 1 }, // Kit Premium Edición Limitada
 				],
 			},
 			{
