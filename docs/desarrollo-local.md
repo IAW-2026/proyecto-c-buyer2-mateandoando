@@ -22,7 +22,7 @@ npm install
 Crear `.env.local` en la raíz con las siguientes variables:
 
 ```env
-# Clerk — obtenidas en el panel de Clerk → API Keys
+# Clerk — obtenidas en el panel de Clerk -> API Keys
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
 
@@ -35,6 +35,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
 # Neon PostgreSQL
 # Usar la URL del pooler para DATABASE_URL
 DATABASE_URL=postgresql://user:password@host-pooler.neon.tech/dbname?sslmode=require
+
 # Usar la URL directa (sin pooler) para migraciones de Prisma
 DIRECT_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
 
@@ -57,14 +58,3 @@ npm run dev
 ```
 
 La app queda disponible en [http://localhost:3000](http://localhost:3000).
-
-## Comandos disponibles
-
-| Comando | Descripción |
-|---|---|
-| `npm run dev` | Servidor de desarrollo con hot-reload |
-| `npm run build` | Genera el cliente Prisma, aplica migraciones y compila para producción |
-| `npm run start` | Inicia el servidor en modo producción (requiere `build` previo) |
-| `npm run lint` | Análisis estático con ESLint |
-| `npx prisma studio` | Interfaz visual para explorar y editar la base de datos |
-| `npx prisma migrate dev` | Crea y aplica una nueva migración en desarrollo |
