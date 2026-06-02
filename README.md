@@ -10,8 +10,8 @@
 
 | Rol | Email | Contraseña |
 |---|---|---|
-| Comprador | buyer+clerktest@iaw.com| `iawuser#` |
-| Admin | buyer-admin+clerktest@iaw.com| `iawuser#` |
+| Comprador | buyer+clerk_test@iaw.com | `iawuser#` |
+| Admin | buyer+admin_clerk_test@iaw.com | `iawuser#` |
 
 ---
 
