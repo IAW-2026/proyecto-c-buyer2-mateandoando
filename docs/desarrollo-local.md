@@ -12,7 +12,7 @@
 ### 1. Clonar e instalar
 
 ```bash
-git clone <url-del-repo>
+git clone https://github.com/IAW-2026/proyecto-c-etapa-1-mateandoando.git
 cd proyecto-c-buyer2-mateandoando
 npm install
 ```
