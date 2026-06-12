@@ -107,6 +107,7 @@ export default async function HomePage({ searchParams }: Props) {
 								category_name={item.category_name}
 								seller_name={item.seller_name}
 								discount_pct={item.discount_pct}
+								image_url={item.image_url}
 							/>
 						))}
 					</div>

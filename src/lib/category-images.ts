@@ -16,9 +16,14 @@ const CATEGORY_IMAGES = {
  * Returns the image for a product, applying name-based overrides
  * before falling back to the category image.
  */
-export function getProductImage(name: string, category_name: string) {
-	const lower = name.toLowerCase()
+export function getProductImage(
+	name: string | undefined,
+	category_name: string | undefined,
+	image_url?: string | null,
+) {
+	if (image_url) return image_url
+	const lower = (name ?? '').toLowerCase()
 	if (lower.startsWith('bombilla')) return bombilla
 	if (lower.startsWith('mate'))     return mate
-	return CATEGORY_IMAGES[category_name as keyof typeof CATEGORY_IMAGES] ?? null
+	return CATEGORY_IMAGES[(category_name ?? '') as keyof typeof CATEGORY_IMAGES] ?? null
 }

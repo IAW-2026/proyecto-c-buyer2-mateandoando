@@ -7,6 +7,7 @@ type SellerItem = {
 	price: number
 	category_name: string
 	discount_pct: number
+	image_url?: string | null
 }
 
 interface Props {
@@ -37,6 +38,7 @@ export default function SellerCatalog({ items, seller_name }: Props) {
 							category_name={item.category_name}
 							seller_name={seller_name}
 							discount_pct={item.discount_pct}
+							image_url={item.image_url}
 						/>
 					))}
 				</div>

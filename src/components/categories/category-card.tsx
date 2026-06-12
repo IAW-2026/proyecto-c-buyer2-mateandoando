@@ -4,8 +4,8 @@ import { ArrowRight } from 'lucide-react'
 import { getProductImage } from '@/lib/category-images'
 
 interface Props {
-	category_name: string
-	item_count: number
+	category_name: string | undefined
+	item_count: number | undefined
 }
 
 export default function CategoryCard({ category_name, item_count }: Props) {
@@ -33,7 +33,7 @@ export default function CategoryCard({ category_name, item_count }: Props) {
 						className="w-full h-full flex items-center justify-center"
 					>
 						<span aria-hidden="true" className="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest">
-							{category_name[0]}
+							{category_name?.[0] ?? '?'}
 						</span>
 					</div>
 				)}
@@ -48,7 +48,7 @@ export default function CategoryCard({ category_name, item_count }: Props) {
 			</div>
 
 			<p className="text-body-sm text-on-surface-variant">
-				{item_count} {item_count === 1 ? 'producto' : 'productos'}
+				{item_count ?? 0} {item_count === 1 ? 'producto' : 'productos'}
 			</p>
 		</Link>
 	)

@@ -7,9 +7,9 @@ interface Props {
 	seller_name: string
 	name: string
 	category_name: string
-	price: number
-	discount_pct: number
-	description: string
+	price: number | undefined
+	discount_pct: number | undefined
+	description: string | undefined
 }
 
 export default function ProductInfo({
@@ -22,9 +22,11 @@ export default function ProductInfo({
 	discount_pct,
 	description,
 }: Props) {
-	const hasDiscount = discount_pct > 0
+	const safePrice = price ?? 0
+	const safePct = discount_pct ?? 0
+	const hasDiscount = safePct > 0
 	const discountedPrice = hasDiscount
-		? Math.round(price * (1 - discount_pct / 100))
+		? Math.round(safePrice * (1 - safePct / 100))
 		: null
 
 	return (
@@ -63,12 +65,12 @@ export default function ProductInfo({
 							${discountedPrice.toLocaleString('es-AR')}
 						</span>
 						<span className="text-body-lg text-on-surface-variant line-through">
-							${price.toLocaleString('es-AR')}
+							${safePrice.toLocaleString('es-AR')}
 						</span>
 					</>
 				) : (
 					<span className="text-headline-lg font-headline-lg text-primary">
-						${price.toLocaleString('es-AR')}
+						${safePrice.toLocaleString('es-AR')}
 					</span>
 				)}
 			</div>
