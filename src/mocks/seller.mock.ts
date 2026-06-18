@@ -220,9 +220,9 @@ export const sellerMock = {
 
 	async getCategories() {
 		const names = [...new Set(ITEMS.map(i => i.category_name))]
-		return names.map(category_name => ({
-			category_name,
-			item_count: ITEMS.filter(i => i.category_name === category_name).length,
+		return names.map(name => ({
+			name,
+			item_count: ITEMS.filter(i => i.category_name === name).length,
 		}))
 	},
 

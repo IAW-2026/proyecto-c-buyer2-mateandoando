@@ -5,12 +5,14 @@ import yerba    from '@/app/ui/images/yerba.webp'
 import bombilla from '@/app/ui/images/bombilla.webp'
 import mate     from '@/app/ui/images/mate.webp'
 
-const CATEGORY_IMAGES = {
-	Accesorios: funda,
-	Kits: kit,
-	Termos: termo,
-	Yerbas: yerba,
-} as const
+const CATEGORY_IMAGES: Record<string, string> = {
+	termos: termo,
+	mates: mate,
+	bombillas: bombilla,
+	yerberas: yerba,
+	canastas: funda,
+	combos: kit,
+}
 
 /**
  * Returns the image for a product, applying name-based overrides
@@ -25,5 +27,5 @@ export function getProductImage(
 	const lower = (name ?? '').toLowerCase()
 	if (lower.startsWith('bombilla')) return bombilla
 	if (lower.startsWith('mate'))     return mate
-	return CATEGORY_IMAGES[(category_name ?? '') as keyof typeof CATEGORY_IMAGES] ?? null
+	return CATEGORY_IMAGES[(category_name ?? '').toLowerCase()] ?? null
 }
