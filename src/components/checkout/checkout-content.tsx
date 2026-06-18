@@ -41,8 +41,8 @@ export default function CheckoutContent({ items, id_buyer }: Props) {
 				const res = await fetch(`/api/shipping/estimate?zip_code=${zip_code}`)
 				if (!res.ok) throw new Error()
 				const data = await res.json()
-				setShippingCost(data.cost)
-				setShippingDays(data.estimated_days)
+				setShippingCost(data.cost ?? null)
+				setShippingDays(data.estimated_days ?? null)
 			} catch {
 				setShippingCost(null)
 				setShippingDays(null)

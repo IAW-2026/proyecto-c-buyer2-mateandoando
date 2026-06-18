@@ -1,24 +1,72 @@
 const SELLER_API_URL = process.env.SELLER_API_URL
-const SELLER_SERVICE_TOKEN = process.env.X_SERVICE_TOKEN_SELLER
 
 const sellerServiceHeaders = {
 	'Content-Type': 'application/json',
-	'X-Service-Token': SELLER_SERVICE_TOKEN ?? '',
 }
+
+function toArray<T>(data: unknown): T[] {
+	if (Array.isArray(data)) return data
+	if (data && typeof data === 'object') {
+		for (const key of ['items', 'data', 'results', 'categories', 'sellers', 'discounts']) {
+			const val = (data as Record<string, unknown>)[key]
+			if (Array.isArray(val)) return val as T[]
+		}
+	}
+	return []
+}
+
+const IMAGE_EXTENSIONS = /\.(jpg|jpeg|png|webp|gif|avif|svg)(\?|$)/i
+const TRUSTED_IMAGE_HOSTS = ['aa2b4pe3oj.ufs.sh']
+
+function isValidImageUrl(url: unknown): url is string {
+	if (!url || typeof url !== 'string') return false
+	try {
+		const { hostname, pathname } = new URL(url)
+		return TRUSTED_IMAGE_HOSTS.includes(hostname) || IMAGE_EXTENSIONS.test(pathname)
+	} catch {
+		return false
+	}
+}
+
+function parseItem(raw: any) {
+	return {
+		id_item: raw.id_item ?? '',
+		name: raw.name ?? '',
+		price: Number(raw.price) || 0,
+		description: raw.description ?? '',
+		category_name: raw.category_name ?? '',
+		id_seller: raw.id_seller ?? '',
+		seller_name: raw.seller_name ?? '',
+		discount_pct: raw.discount_percentage ?? 0,
+		image_url: isValidImageUrl(raw.image_url) ? raw.image_url : null,
+	}
+}
+
 
 export const sellerApi = {
 	async getItems() {
-		const res = await fetch(`${SELLER_API_URL}/api/items`, {
-			headers: sellerServiceHeaders,
-		})
-		return res.json()
+		const res = await fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders })
+		const data = await res.json()
+		const items = toArray<any>(data).map(parseItem)
+		return { items, page: (data as any)?.page ?? 1, total: (data as any)?.total ?? items.length }
 	},
 
 	async getCategories() {
-		const res = await fetch(`${SELLER_API_URL}/api/categories`, {
-			headers: sellerServiceHeaders,
-		})
-		return res.json()
+		const [catsRes, itemsRes] = await Promise.all([
+			fetch(`${SELLER_API_URL}/api/categories`, { headers: sellerServiceHeaders }),
+			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders }),
+		])
+		const [catsData, itemsData] = await Promise.all([catsRes.json(), itemsRes.json()])
+
+		const countById: Record<string, number> = {}
+		for (const item of toArray<any>(itemsData))
+			if (item.id_category) countById[item.id_category] = (countById[item.id_category] ?? 0) + 1
+
+		return toArray<any>(catsData).map(raw => ({
+			name: raw.name ?? raw.category_name ?? '',
+			id_category: raw.id_category ?? '',
+			item_count: raw.item_count ?? countById[raw.id_category] ?? 0,
+		}))
 	},
 
 	async getItemsByCategory(category_name: string) {
@@ -26,7 +74,9 @@ export const sellerApi = {
 			`${SELLER_API_URL}/api/categories/${encodeURIComponent(category_name)}`,
 			{ headers: sellerServiceHeaders },
 		)
-		return res.json()
+		const data = await res.json()
+		// Seller API items don't include category_name — inject it from the route param so navigation links work
+		return toArray<any>(data).map(raw => parseItem({ ...raw, category_name: raw.category_name ?? category_name }))
 	},
 
 	async getItemDetail(category_name: string, id_item: string) {
@@ -34,23 +84,40 @@ export const sellerApi = {
 			`${SELLER_API_URL}/api/categories/${encodeURIComponent(category_name)}/${encodeURIComponent(id_item)}`,
 			{ headers: sellerServiceHeaders },
 		)
-		return res.json()
+		const data = await res.json()
+		if (!data) return null
+		for (const key of ['item', 'product', 'data']) {
+			if (data[key] && typeof data[key] === 'object' && !Array.isArray(data[key]))
+				return parseItem(data[key])
+		}
+		return parseItem(data)
 	},
-
 
 	async getSellers() {
 		const res = await fetch(`${SELLER_API_URL}/api/sellers`, {
 			headers: sellerServiceHeaders,
 		})
-		return res.json()
+		const data = await res.json()
+		return toArray<{ id_seller: string; name: string; description: string }>(data)
 	},
 
 	async getSellerById(id_seller: string) {
-		const res = await fetch(
-			`${SELLER_API_URL}/api/sellers/${encodeURIComponent(id_seller)}`,
-			{ headers: sellerServiceHeaders },
-		)
-		return res.json()
+		const [sellerRes, itemsRes] = await Promise.all([
+			fetch(`${SELLER_API_URL}/api/sellers/${encodeURIComponent(id_seller)}`, { headers: sellerServiceHeaders }),
+			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders }),
+		])
+		const [sellerData, itemsData] = await Promise.all([sellerRes.json(), itemsRes.json()])
+		if (!sellerData) return null
+
+		const allItems = toArray<any>(itemsData).map(parseItem)
+		const items = allItems.filter(item => item.id_seller === id_seller)
+
+		return {
+			id_seller: sellerData.id_seller ?? sellerData.id ?? id_seller,
+			name: sellerData.name ?? '',
+			description: sellerData.description ?? '',
+			items,
+		}
 	},
 
 	async getDiscounts(min_pct: number = 0) {
@@ -59,7 +126,8 @@ export const sellerApi = {
 			headers: sellerServiceHeaders,
 			body: JSON.stringify({ min_discount_percentage: min_pct }),
 		})
-		return res.json()
+		const data = await res.json()
+		return toArray(data)
 	},
 
 	async createPurchaseOrder(

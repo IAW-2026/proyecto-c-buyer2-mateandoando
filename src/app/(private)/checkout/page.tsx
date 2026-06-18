@@ -16,6 +16,7 @@ type CartItemWithProduct = {
         id_seller: string
         seller_name: string
         discount_pct: number
+        image_url: string | null
     }
 }
 
@@ -59,7 +60,7 @@ export default async function CheckoutPage() {
     
     const { items: allItems } = await sellerService.getItems()
     const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
-        allItems.map((item: { id_item: string }) => [item.id_item, item])
+        allItems.map(item => [item.id_item, item])
     )
 
     const enriched = cartItems.map(cartItem => {

@@ -70,7 +70,7 @@ export default async function SeguimientoPage({
 	])
 
 	const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
-		allItems.map((i: { id_item: string }) => [i.id_item, i])
+		allItems.map(i => [i.id_item, i])
 	)
 	const sellerMap: Record<string, typeof sellerResults[number]> = Object.fromEntries(
 		uniqueSellerIds.map((id, idx) => [id, sellerResults[idx]])
