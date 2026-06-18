@@ -11,12 +11,9 @@ export const shippingApi = {
 	async estimateShipping(zip_code: string) {
 		const base = SHIPPING_API_URL?.replace(/\/$/, '')
 		const url = `${base}/api/shippings/estimate`
-		const headers = serviceHeaders()
-		console.log('[shipping.api] POST', url)
-		console.log('[shipping.api] x-api-key set?', !!headers['x-api-key'], '| length:', headers['x-api-key'].length)
 		const res = await fetch(url, {
 			method: 'POST',
-			headers,
+			headers: serviceHeaders(),
 			body: JSON.stringify({ destination_zip_code: zip_code }),
 		})
 		return res.json()

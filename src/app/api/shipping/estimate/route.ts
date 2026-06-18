@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
 		)
 
 	const raw = await shippingService.estimateShipping(zip_code)
-	console.log('[shipping estimate raw]', JSON.stringify(raw))
 
 	const cost = Number(raw.cost ?? raw.shipping_cost ?? raw.price ?? raw.amount) || null
 	const estimated_days = Number(raw.estimated_days ?? raw.days ?? raw.delivery_days ?? raw.business_days) || null
