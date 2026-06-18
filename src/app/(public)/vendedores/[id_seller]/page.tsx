@@ -4,6 +4,8 @@ import Breadcrumb from '@/components/breadcrumb'
 import SellerPresentationCard from '@/components/sellers/seller-presentation-card'
 import SellerCatalog from '@/components/sellers/seller-catalog'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
 	params: Promise<{ id_seller: string }>
 }

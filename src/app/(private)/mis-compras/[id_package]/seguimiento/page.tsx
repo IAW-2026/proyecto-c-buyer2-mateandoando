@@ -39,6 +39,7 @@ export default async function SeguimientoPage({
 					id_buyer: true,
 					total_price: true,
 					id_purchase_order: true,
+					status: true,
 					address: {
 						select: {
 							street:   true,
@@ -123,7 +124,7 @@ export default async function SeguimientoPage({
 				{/* Left column: status + history */}
 				<div className="lg:col-span-8 flex flex-col gap-6">
 					<TrackingStatusCard
-						status={tracking.status}
+						status={tracking.status || orderPackage.order.status}
 						carrier_name={tracking.carrier_name}
 					/>
 					<TrackingHistory history={tracking.history ?? []} />

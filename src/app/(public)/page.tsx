@@ -4,6 +4,8 @@ import ProductCard from '@/components/product-card'
 import SearchControls from '@/components/search-controls'
 import Pagination from '@/components/pagination'
 
+export const dynamic = 'force-dynamic'
+
 const PAGE_SIZE = 12
 
 interface Props {
