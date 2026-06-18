@@ -133,17 +133,18 @@ export const sellerApi = {
 	async createPurchaseOrder(
 		id_buyer: string,
 		items: { id_item: string; quantity: number }[],
-		_address: string,
-		_zip_code: string,
+		address: string,
+		zip_code: string,
 		token?: string,
 	) {
+		const body = { id_buyer, items, address_snapshot: address, zip_code: Number(zip_code) }
 		const res = await fetch(`${SELLER_API_URL}/api/purchase-orders`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
-			body: JSON.stringify({ id_buyer, items }),
+			body: JSON.stringify(body),
 		})
 		return res.json()
 	},
