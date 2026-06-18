@@ -98,7 +98,7 @@ export const sellerApi = {
 
 	async getSellers() {
 		const res = await fetch(`${SELLER_API_URL}/api/sellers`, {
-			headers: sellerServiceHeaders,
+			headers: sellerServiceHeaders(),
 		})
 		const data = await res.json()
 		return toArray<{ id_seller: string; name: string; description: string }>(data)
@@ -126,7 +126,7 @@ export const sellerApi = {
 	async getDiscounts(min_pct: number = 0) {
 		const res = await fetch(`${SELLER_API_URL}/api/discounts`, {
 			method: 'POST',
-			headers: sellerServiceHeaders,
+			headers: sellerServiceHeaders(),
 			body: JSON.stringify({ min_discount_percentage: min_pct }),
 		})
 		const data = await res.json()
