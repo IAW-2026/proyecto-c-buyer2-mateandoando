@@ -1,17 +1,23 @@
 import { Truck } from 'lucide-react'
 
 const statusLabel: Record<string, string> = {
-	RETIRADO:    'Retirado del vendedor',
+	PENDIENTE:   'Pendiente',
+	PREPARADO:   'Preparando envío',
+	DESPACHADO:  'Despachado por el vendedor',
 	EN_TRANSITO: 'En tránsito',
 	ENTREGADO:   'Entregado',
 	RETORNADO:   'Retornado',
+	CANCELADA:   'Cancelado',
 }
 
 const statusColor: Record<string, string> = {
-	RETIRADO:    'text-secondary',
+	PENDIENTE:   'text-on-surface-variant',
+	PREPARADO:   'text-secondary',
+	DESPACHADO:  'text-secondary',
 	EN_TRANSITO: 'text-secondary',
 	ENTREGADO:   'text-primary',
 	RETORNADO:   'text-error',
+	CANCELADA:   'text-error',
 }
 
 interface Props {

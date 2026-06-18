@@ -4,6 +4,8 @@ import Breadcrumb from '@/components/breadcrumb'
 import ProductImage from '@/components/categories/product-image'
 import ProductInfo from '@/components/categories/product-info'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
 	params: Promise<{ category_name: string; id_item: string }>
 }

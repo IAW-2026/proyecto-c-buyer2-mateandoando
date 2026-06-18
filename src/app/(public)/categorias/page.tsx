@@ -1,6 +1,8 @@
 import { sellerService } from '@/services/seller'
 import CategoryCard from '@/components/categories/category-card'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CategoriasPage() {
 	const categories = await sellerService.getCategories()
 

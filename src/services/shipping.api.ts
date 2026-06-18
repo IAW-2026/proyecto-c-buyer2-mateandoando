@@ -21,9 +21,7 @@ export const shippingApi = {
 
 	async trackPackage(id_package: string) {
 		const base = SHIPPING_API_URL?.replace(/\/$/, '')
-		const res = await fetch(`${base}/api/shippings/track/${id_package}`, {
-			headers: serviceHeaders(),
-		})
+		const res = await fetch(`${base}/api/shippings/track/${id_package}`)
 		return res.json()
 	},
 }
