@@ -11,6 +11,7 @@ interface Props {
 	category_name: string
 	seller_name: string
 	discount_pct: number
+	image_url?: string | null
 }
 
 export default function ProductCard({
@@ -21,11 +22,12 @@ export default function ProductCard({
 	category_name,
 	seller_name,
 	discount_pct,
+	image_url,
 }: Props) {
 	const hasDiscount = discount_pct > 0
 	const discountedPrice = hasDiscount ? Math.round(price * (1 - discount_pct / 100)) : null
 	const detailHref = `/categorias/${encodeURIComponent(category_name)}/${id_item}`
-	const src = getProductImage(name, category_name)
+	const src = getProductImage(name, category_name, image_url)
 
 	return (
 		<Link

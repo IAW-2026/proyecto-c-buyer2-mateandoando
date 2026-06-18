@@ -2,12 +2,13 @@ import Image from 'next/image'
 import { getProductImage } from '@/lib/category-images'
 
 interface Props {
-	name: string
-	category_name: string
+	name: string | undefined
+	category_name: string | undefined
+	image_url?: string | null
 }
 
-export default function ProductImage({ name, category_name }: Props) {
-	const src = getProductImage(name, category_name)
+export default function ProductImage({ name, category_name, image_url }: Props) {
+	const src = getProductImage(name, category_name, image_url)
 
 	return (
 		<section className="lg:col-span-7">
@@ -28,7 +29,7 @@ export default function ProductImage({ name, category_name }: Props) {
 						className="w-full h-full flex items-center justify-center"
 					>
 						<span aria-hidden="true" className="text-8xl font-heading font-bold text-outline opacity-30">
-							{name[0]}
+							{name?.[0] ?? '?'}
 						</span>
 					</div>
 				)}

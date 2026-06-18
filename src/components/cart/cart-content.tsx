@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
+import { useCartStore } from '@/store/cart-store'
 
 type CartItem = {
     id_cart_item: string
@@ -17,6 +19,7 @@ type CartItem = {
         id_seller: string
         seller_name: string
         discount_pct: number
+        image_url: string | null
     }
 }
 
@@ -26,50 +29,59 @@ interface Props {
 
 export default function CartContent({ initialItems }: Props) {
     const [items, setItems] = useState<CartItem[]>(initialItems)
+    const increment = useCartStore(s => s.increment)
+    const decrement = useCartStore(s => s.decrement)
 
     const subtotal = items.reduce(
         (acc, item) => acc + effectivePrice(item) * item.quantity, 0
     )
     
     async function updateQuantity(id_cart_item: string, newQuantity: number) {
-        if (newQuantity < 1)
-            return
-        
-        const previous = items // snapshot current state
+        if (newQuantity < 1) return
 
-        // update the items in the UI
+        const current = items.find(i => i.id_cart_item === id_cart_item)
+        if (!current) return
+
+        const delta = newQuantity - current.quantity
+        const previous = items
+
         setItems(prev =>
             prev.map(item =>
                 item.id_cart_item === id_cart_item ? { ...item, quantity: newQuantity } : item
             )
         )
-        
-        // update db
+        if (delta > 0) increment(delta)
+        else if (delta < 0) decrement(-delta)
+
         const res = await fetch(`/api/cart/items/${id_cart_item}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ quantity: newQuantity }),
         })
-        
-        if (!res.ok)
+
+        if (!res.ok) {
             setItems(previous)
-            // Display an error message?
+            if (delta > 0) decrement(delta)
+            else if (delta < 0) increment(-delta)
+        }
     }
-    
+
     async function removeItem(id_cart_item: string) {
+        const current = items.find(i => i.id_cart_item === id_cart_item)
+        const removedQty = current?.quantity ?? 1
         const previous = items
 
-        setItems(prev => prev.filter(
-            item => item.id_cart_item !== id_cart_item)
-        )
-        
-        // Remove from db
+        setItems(prev => prev.filter(item => item.id_cart_item !== id_cart_item))
+        decrement(removedQty)
+
         const res = await fetch(`/api/cart/items/${id_cart_item}`, {
             method: 'DELETE',
         })
-        
-        if (!res.ok) 
+
+        if (!res.ok) {
             setItems(previous)
+            increment(removedQty)
+        }
     }
     
     function effectivePrice(item: CartItem) {
@@ -106,8 +118,22 @@ export default function CartContent({ initialItems }: Props) {
                 return (
                     <div key={item.id_cart_item} className="flex items-center gap-4 py-5">
                     
-                        {/* Image placeholder */}
-                        <div className="w-20 h-20 rounded-lg bg-surface-container flex-shrink-0 border border-outline-variant" />
+                        {/* Image */}
+                        <div className="w-20 h-20 rounded-lg bg-surface-container flex-shrink-0 border border-outline-variant overflow-hidden relative">
+                            {item.product.image_url ? (
+                                <Image
+                                    src={item.product.image_url}
+                                    alt={item.product.name}
+                                    fill
+                                    className="object-cover"
+                                    sizes="80px"
+                                />
+                            ) : (
+                                <span className="w-full h-full flex items-center justify-center text-2xl font-bold text-outline opacity-30">
+                                    {item.product.name[0]}
+                                </span>
+                            )}
+                        </div>
                     
                         {/* Info */}
                         <div className="flex-grow min-w-0">

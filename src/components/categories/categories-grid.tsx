@@ -9,6 +9,7 @@ type CategoryItem = {
 	category_name: string
 	seller_name: string
 	discount_pct: number
+	image_url?: string | null
 }
 
 interface Props {
@@ -49,6 +50,7 @@ export default function CategoriesGrid({ items, category_name, onlyDiscounted }:
 							category_name={item.category_name}
 							seller_name={item.seller_name}
 							discount_pct={item.discount_pct}
+							image_url={item.image_url}
 						/>
 					))}
 				</div>

@@ -26,7 +26,7 @@ export default async function ProductDetailPage({ params }: Props) {
 			]} />
 
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-				<ProductImage name={item.name} category_name={decoded} />
+				<ProductImage name={item.name} category_name={decoded} image_url={item.image_url} />
                 
 				<ProductInfo
 					id_item={item.id_item}
