@@ -212,7 +212,7 @@ const SELLERS = [
 export const sellerMock = {
 	async getItems() {
 		return {
-			items: ITEMS,
+			items: ITEMS.map(i => ({ ...i, image_url: null })),
 			page: 1,
 			total: ITEMS.length,
 		}
@@ -227,13 +227,13 @@ export const sellerMock = {
 	},
 
 	async getItemsByCategory(category_name: string) {
-		return ITEMS.filter(i => i.category_name === category_name)
+		return ITEMS.filter(i => i.category_name === category_name).map(i => ({ ...i, image_url: null }))
 	},
 
 	async getItemDetail(_category_name: string, id_item: string) {
-		return ITEMS.find(i => i.id_item === id_item) ?? null
+		const item = ITEMS.find(i => i.id_item === id_item)
+		return item ? { ...item, image_url: null } : null
 	},
-
 
 	async getSellers() {
 		return SELLERS
@@ -244,7 +244,7 @@ export const sellerMock = {
 		if (!seller) return null
 		return {
 			...seller,
-			items: ITEMS.filter(i => i.id_seller === id_seller),
+			items: ITEMS.filter(i => i.id_seller === id_seller).map(i => ({ ...i, image_url: null })),
 		}
 	},
 
