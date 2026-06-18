@@ -4,6 +4,8 @@ import CategoryFilters from './category-filters'
 import Breadcrumb from '@/components/breadcrumb'
 import CategoriesGrid from '@/components/categories/categories-grid'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
     params: Promise<{ category_name: string }>
     searchParams: Promise<{ descuento?: string }>
