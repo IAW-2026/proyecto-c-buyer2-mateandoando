@@ -45,7 +45,28 @@ export async function POST(req: NextRequest) {
 		token ?? undefined,
 	)
 
+	if (purchaseOrder.error || !purchaseOrder.packages) {
+		return NextResponse.json(
+			{ error: purchaseOrder.error ?? 'Error al crear la orden en Seller App' },
+			{ status: 502 },
+		)
+	}
+
 	const totalWithShipping = purchaseOrder.total_price + (shipping_cost ?? 0)
+
+	// Group request items by seller so we can associate them with each package
+	const { items: catalogItems } = await sellerService.getItems()
+	const itemSellerMap: Record<string, string> = Object.fromEntries(
+		catalogItems.map(ci => [ci.id_item, ci.id_seller])
+	)
+	const itemsBySeller: Record<string, { id_item: string; quantity: number }[]> = {}
+	for (const item of items) {
+		const sellerId = itemSellerMap[item.id_item]
+		if (sellerId) {
+			if (!itemsBySeller[sellerId]) itemsBySeller[sellerId] = []
+			itemsBySeller[sellerId].push(item)
+		}
+	}
 
 	// 2. Request payment from Payments App
 	const payment = await paymentsService.createPayment(
@@ -53,10 +74,9 @@ export async function POST(req: NextRequest) {
 			id_purchase_order: purchaseOrder.id_purchase_order,
 			id_buyer,
 			total_price: totalWithShipping,
-			packages: purchaseOrder.packages.map((pkg: { id_package: string; id_seller: string; items: { unit_price: number; quantity: number }[] }) => ({
+			packages: purchaseOrder.packages.map((pkg: { id_package: string; id_seller: string }) => ({
 				id_package: pkg.id_package,
 				id_seller: pkg.id_seller,
-				amount: pkg.items.reduce((sum: number, i: { unit_price: number; quantity: number }) => sum + i.unit_price * i.quantity, 0),
 			})),
 		},
 		token ?? undefined,
@@ -94,7 +114,7 @@ export async function POST(req: NextRequest) {
 				id_purchase_order: purchaseOrder.id_purchase_order,
 				id_seller: pkg.id_seller,
 				items: {
-					create: pkg.items.map((pkgItem: { id_item: string; quantity: number }) => ({
+					create: (itemsBySeller[pkg.id_seller] ?? []).map((pkgItem: { id_item: string; quantity: number }) => ({
 						id_item: pkgItem.id_item,
 						quantity: pkgItem.quantity,
 					})),
