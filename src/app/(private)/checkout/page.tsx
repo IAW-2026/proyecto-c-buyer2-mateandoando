@@ -16,6 +16,7 @@ type CartItemWithProduct = {
         id_seller: string
         seller_name: string
         discount_pct: number
+        image_url: string | null
     }
 }
 
