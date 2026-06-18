@@ -98,7 +98,7 @@ export const sellerApi = {
 			headers: sellerServiceHeaders,
 		})
 		const data = await res.json()
-		return toArray(data)
+		return toArray<{ id_seller: string; name: string; description: string }>(data)
 	},
 
 	async getSellerById(id_seller: string) {

@@ -1,3 +1,4 @@
+import type { StaticImageData } from 'next/image'
 import funda    from '@/app/ui/images/funda.webp'
 import kit      from '@/app/ui/images/kit.webp'
 import termo    from '@/app/ui/images/termo.webp'
@@ -5,7 +6,7 @@ import yerba    from '@/app/ui/images/yerba.webp'
 import bombilla from '@/app/ui/images/bombilla.webp'
 import mate     from '@/app/ui/images/mate.webp'
 
-const CATEGORY_IMAGES: Record<string, string> = {
+const CATEGORY_IMAGES: Record<string, StaticImageData> = {
 	termos: termo,
 	mates: mate,
 	bombillas: bombilla,
