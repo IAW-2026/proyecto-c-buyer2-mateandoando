@@ -1,7 +1,10 @@
 const SELLER_API_URL = process.env.SELLER_API_URL
 
-const sellerServiceHeaders = {
-	'Content-Type': 'application/json',
+function sellerServiceHeaders() {
+	return {
+		'Content-Type': 'application/json',
+		'x-api-key': process.env.BUYER_SELLER_API_KEY ?? '',
+	}
 }
 
 function toArray<T>(data: unknown): T[] {
@@ -45,7 +48,7 @@ function parseItem(raw: any) {
 
 export const sellerApi = {
 	async getItems() {
-		const res = await fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders })
+		const res = await fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders() })
 		const data = await res.json()
 		const items = toArray<any>(data).map(parseItem)
 		return { items, page: (data as any)?.page ?? 1, total: (data as any)?.total ?? items.length }
@@ -53,8 +56,8 @@ export const sellerApi = {
 
 	async getCategories() {
 		const [catsRes, itemsRes] = await Promise.all([
-			fetch(`${SELLER_API_URL}/api/categories`, { headers: sellerServiceHeaders }),
-			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders }),
+			fetch(`${SELLER_API_URL}/api/categories`, { headers: sellerServiceHeaders() }),
+			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders() }),
 		])
 		const [catsData, itemsData] = await Promise.all([catsRes.json(), itemsRes.json()])
 
@@ -72,7 +75,7 @@ export const sellerApi = {
 	async getItemsByCategory(category_name: string) {
 		const res = await fetch(
 			`${SELLER_API_URL}/api/categories/${encodeURIComponent(category_name)}`,
-			{ headers: sellerServiceHeaders },
+			{ headers: sellerServiceHeaders() },
 		)
 		const data = await res.json()
 		// Seller API items don't include category_name — inject it from the route param so navigation links work
@@ -82,7 +85,7 @@ export const sellerApi = {
 	async getItemDetail(category_name: string, id_item: string) {
 		const res = await fetch(
 			`${SELLER_API_URL}/api/categories/${encodeURIComponent(category_name)}/${encodeURIComponent(id_item)}`,
-			{ headers: sellerServiceHeaders },
+			{ headers: sellerServiceHeaders() },
 		)
 		const data = await res.json()
 		if (!data) return null
@@ -95,7 +98,7 @@ export const sellerApi = {
 
 	async getSellers() {
 		const res = await fetch(`${SELLER_API_URL}/api/sellers`, {
-			headers: sellerServiceHeaders,
+			headers: sellerServiceHeaders(),
 		})
 		const data = await res.json()
 		return toArray<{ id_seller: string; name: string; description: string }>(data)
@@ -103,8 +106,8 @@ export const sellerApi = {
 
 	async getSellerById(id_seller: string) {
 		const [sellerRes, itemsRes] = await Promise.all([
-			fetch(`${SELLER_API_URL}/api/sellers/${encodeURIComponent(id_seller)}`, { headers: sellerServiceHeaders }),
-			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders }),
+			fetch(`${SELLER_API_URL}/api/sellers/${encodeURIComponent(id_seller)}`, { headers: sellerServiceHeaders() }),
+			fetch(`${SELLER_API_URL}/api/items`, { headers: sellerServiceHeaders() }),
 		])
 		const [sellerData, itemsData] = await Promise.all([sellerRes.json(), itemsRes.json()])
 		if (!sellerData) return null
@@ -123,7 +126,7 @@ export const sellerApi = {
 	async getDiscounts(min_pct: number = 0) {
 		const res = await fetch(`${SELLER_API_URL}/api/discounts`, {
 			method: 'POST',
-			headers: sellerServiceHeaders,
+			headers: sellerServiceHeaders(),
 			body: JSON.stringify({ min_discount_percentage: min_pct }),
 		})
 		const data = await res.json()
@@ -141,7 +144,7 @@ export const sellerApi = {
 		const res = await fetch(`${SELLER_API_URL}/api/purchase-orders`, {
 			method: 'POST',
 			headers: {
-				'Content-Type': 'application/json',
+				...sellerServiceHeaders(),
 				...(token ? { Authorization: `Bearer ${token}` } : {}),
 			},
 			body: JSON.stringify(body),
