@@ -9,7 +9,10 @@ export async function PATCH(req: NextRequest) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
-	const { id_purchase_order, id_payment_operation, status, payment_hash } = await req.json()
+	const body = await req.json()
+	console.log('[payment-notification] received:', body)
+
+	const { id_purchase_order, id_payment_operation, status, payment_hash } = body
 
 	if (!id_purchase_order || !id_payment_operation || !status) {
 		return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 		getToken(),
 	])
 
-	const { id_buyer, address, items, shipping_cost } = body
+	const { id_buyer, address, items } = body
 
 	// Validate required top-level fields
 	if (!id_buyer || !address || !Array.isArray(items) || items.length === 0) {
@@ -52,8 +52,6 @@ export async function POST(req: NextRequest) {
 		)
 	}
 
-	const totalWithShipping = purchaseOrder.total_price + (shipping_cost ?? 0)
-
 	// Group request items by seller so we can associate them with each package
 	const { items: catalogItems } = await sellerService.getItems()
 	const itemSellerMap: Record<string, string> = Object.fromEntries(
@@ -73,7 +71,7 @@ export async function POST(req: NextRequest) {
 		{
 			id_purchase_order: purchaseOrder.id_purchase_order,
 			id_buyer,
-			total_price: totalWithShipping,
+			total_price: purchaseOrder.total_price,
 			packages: purchaseOrder.packages.map((pkg: { id_package: string; id_seller: string }) => ({
 				id_package: pkg.id_package,
 				id_seller: pkg.id_seller,
@@ -101,9 +99,10 @@ export async function POST(req: NextRequest) {
 			id_purchase_order: purchaseOrder.id_purchase_order,
 			id_buyer,
 			id_address: savedAddress.id_address,
-			total_price: totalWithShipping,
+			total_price: purchaseOrder.total_price,
 			status: 'PENDIENTE',
 			id_payment_operation: payment.id_payment_operation,
+			checkout_url: payment.checkout_url ?? null,
 		},
 	})
 
