@@ -164,6 +164,7 @@ export default async function MisComprasPage({ searchParams }: Props) {
 									created_at={order.created_at}
 									total_price={Number(order.total_price)}
 									status={order.status}
+									checkout_url={order.checkout_url ?? null}
 									packages={order.packages}
 								/>
 							))}

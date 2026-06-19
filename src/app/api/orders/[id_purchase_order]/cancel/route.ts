@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { paymentsService } from '@/services/payments'
 import { shippingService } from '@/services/shipping'
 
-const DISPATCHED_STATUSES = ['RETIRADO', 'EN_TRANSITO', 'ENTREGADO', 'RETORNADO']
+const DISPATCHED_STATUSES = ['DESPACHADO', 'EN_TRANSITO', 'ENTREGADO', 'RETORNADO']
 
 export async function POST(
 	req: NextRequest,
@@ -37,45 +37,38 @@ export async function POST(
 	if (!order || order.id_buyer !== buyer.id_buyer)
 		return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-	if (order.status !== 'PENDIENTE' && order.status !== 'APROBADO')
+	if (order.status !== 'APROBADO')
 		return NextResponse.json(
-			{ error: 'Only PENDIENTE or APROBADO orders can be cancelled' },
+			{ error: 'Only APROBADO orders can be cancelled' },
 			{ status: 409 },
 		)
 
-	// For APROBADO orders, verify no package has been dispatched yet
-	if (order.status === 'APROBADO') {
-		const packages = await db.package.findMany({
-			where: { id_purchase_order },
-			select: { id_package: true },
-		})
-
-		const trackingResults = await Promise.all(
-			packages.map(pkg => shippingService.trackPackage(pkg.id_package))
-		)
-
-		const anyDispatched = trackingResults.some(t =>
-			DISPATCHED_STATUSES.includes(t.status)
-		)
-
-		if (anyDispatched)
-			return NextResponse.json(
-				{ error: 'Cannot cancel: one or more packages have already been dispatched' },
-				{ status: 409 },
-			)
-	}
-
 	const token = await getToken()
+
+	// APROBADO: verify no package has been dispatched yet
+	const packages = await db.package.findMany({
+		where: { id_purchase_order },
+		select: { id_package: true },
+	})
+
+	const trackingResults = await Promise.all(
+		packages.map(pkg => shippingService.trackPackage(pkg.id_package))
+	)
+
+	const anyDispatched = trackingResults.some(t => DISPATCHED_STATUSES.includes(t.status))
+
+	if (anyDispatched)
+		return NextResponse.json(
+			{ error: 'No se puede cancelar: uno o más paquetes ya fueron despachados' },
+			{ status: 409 },
+		)
+
 	await paymentsService.cancelPayment(order.id_payment_operation, token ?? undefined)
 
 	const updated = await db.purchaseOrder.update({
 		where: { id_purchase_order },
 		data: { status: 'REEMBOLSADO' },
-		select: {
-			id_purchase_order: true,
-			status: true,
-			updated_at: true,
-		},
+		select: { id_purchase_order: true, status: true, updated_at: true },
 	})
 
 	return NextResponse.json(updated)

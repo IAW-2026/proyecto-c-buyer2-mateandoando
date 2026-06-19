@@ -61,6 +61,7 @@ enum OrderStatus {
   APROBADO
   RECHAZADO
   REEMBOLSADO
+  CANCELADA
 }
 
 model PurchaseOrder {
@@ -73,6 +74,7 @@ model PurchaseOrder {
   status               OrderStatus @default(PENDIENTE)
   id_payment_operation String?
   payment_hash         String?
+  checkout_url         String?
   created_at           DateTime    @default(now())
   updated_at           DateTime    @updatedAt
   packages             Package[]

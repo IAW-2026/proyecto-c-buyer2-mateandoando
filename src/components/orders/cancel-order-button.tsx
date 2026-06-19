@@ -5,15 +5,20 @@ import { useRouter } from 'next/navigation'
 
 interface Props {
 	id_purchase_order: string
+	status: string
 }
 
-export default function CancelOrderButton({ id_purchase_order }: Props) {
+export default function CancelOrderButton({ id_purchase_order, status }: Props) {
 	const router = useRouter()
 	const [isPending, setIsPending] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
+	const confirmMessage = status === 'APROBADO'
+		? '¿Estás seguro que querés cancelar esta compra? Se iniciará el reembolso.'
+		: '¿Estás seguro que querés cancelar esta compra?'
+
 	async function handleCancel() {
-		const confirmed = window.confirm('¿Estás seguro que querés cancelar esta compra? Se iniciará el reembolso.')
+		const confirmed = window.confirm(confirmMessage)
 		if (!confirmed) return
 
 		setIsPending(true)
