@@ -1,8 +1,8 @@
-import { withServiceAuth } from '@/lib/auth/clerk'
+import { withApiKeyAuth } from '@/lib/auth/clerk'
 import { db } from '@/lib/db'
 
-export const GET = withServiceAuth(
-  'X_SERVICE_TOKEN_SELLER',
+export const GET = withApiKeyAuth(
+  'BUYER_SELLER_API_KEY',
   async (req: Request, { params }: { params: Promise<{ id_buyer: string }> }) => {
     
     const { id_buyer } = await params
