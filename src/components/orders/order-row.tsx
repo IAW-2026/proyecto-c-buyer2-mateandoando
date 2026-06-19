@@ -6,6 +6,7 @@ const statusLabel: Record<string, string> = {
 	APROBADO:    'Aprobado',
 	RECHAZADO:   'Rechazado',
 	REEMBOLSADO: 'Reembolsado',
+	CANCELADA:   'Cancelada',
 }
 
 const statusTextColor: Record<string, string> = {
@@ -13,6 +14,7 @@ const statusTextColor: Record<string, string> = {
 	APROBADO:    'text-primary',
 	RECHAZADO:   'text-error',
 	REEMBOLSADO: 'text-on-surface-variant',
+	CANCELADA:   'text-on-surface-variant',
 }
 
 type OrderPackage = {
@@ -25,6 +27,7 @@ interface Props {
 	created_at: Date
 	total_price: number
 	status: string
+	checkout_url: string | null
 	packages: OrderPackage[]
 }
 
@@ -33,16 +36,17 @@ export default function OrderRow({
 	created_at,
 	total_price,
 	status,
+	checkout_url,
 	packages,
 }: Props) {
 	const firstPackageId = packages[0]?.id_package
 
-	const allNames = packages.flatMap(pkg => 
+	const allNames = packages.flatMap(pkg =>
 		pkg.items.map(item => item.quantity > 1 ? `${item.product_name} ×${item.quantity}` : item.product_name)
 	)
 
 	const displayNames = allNames.slice(0, 2).join(', ')
-	const remainder = allNames.length - 2 // to display +{count} más
+	const remainder = allNames.length - 2
 
 	return (
 		<div className="flex items-center gap-8 py-6">
@@ -91,7 +95,7 @@ export default function OrderRow({
 
 			{/* CTA */}
 			<div className="flex flex-col gap-2 flex-shrink-0 w-36">
-				{firstPackageId ? (
+				{firstPackageId && (
 					<Link
 						href={`/mis-compras/${firstPackageId}/seguimiento`}
 						aria-label={`Ver detalle del pedido #${id_purchase_order.slice(0, 8).toUpperCase()}`}
@@ -99,11 +103,17 @@ export default function OrderRow({
 					>
 						Ver detalle
 					</Link>
-				) : (
-					<span className="text-label-sm text-on-surface-variant">Sin paquetes</span>
 				)}
-				{(status === 'PENDIENTE' || status === 'APROBADO') && (
-					<CancelOrderButton id_purchase_order={id_purchase_order} />
+				{status === 'PENDIENTE' && checkout_url && (
+					<a
+						href={checkout_url}
+						className="block text-center w-full bg-primary text-on-primary px-5 py-2 rounded-lg text-body-sm font-medium hover:opacity-90 transition-opacity"
+					>
+						Reintentar Pago
+					</a>
+				)}
+				{status === 'APROBADO' && (
+					<CancelOrderButton id_purchase_order={id_purchase_order} status={status} />
 				)}
 			</div>
 
