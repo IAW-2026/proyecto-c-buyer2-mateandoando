@@ -5,17 +5,11 @@ import { db } from '@/lib/db'
 export async function PATCH(req: NextRequest) {
 	const key = req.headers.get('X-Api-Key')
 
-	console.log('[payment-notification] x-api-key received:', key)
-	console.log('[payment-notification] BUYER_APP_SECRET_KEY set?', !!process.env.BUYER_APP_SECRET_KEY, '| length:', process.env.BUYER_APP_SECRET_KEY?.length ?? 0)
-
 	if (!isServiceTokenValid(key ?? undefined, process.env.BUYER_APP_SECRET_KEY)) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 	}
 
-	const body = await req.json()
-	console.log('[payment-notification] received:', body)
-
-	const { id_purchase_order, id_payment_operation, status, payment_hash } = body
+	const { id_purchase_order, id_payment_operation, status, payment_hash } = await req.json()
 
 	if (!id_purchase_order || !id_payment_operation || !status) {
 		return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
