@@ -2,12 +2,14 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 import { sellerService } from '@/services/seller'
 import { shippingService } from '@/services/shipping'
+import { paymentsService } from '@/services/payments'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import TrackingStatusCard from '@/components/orders/tracking-status-card'
 import TrackingHistory from '@/components/orders/tracking-history'
 import OrderInfoPanel from '@/components/orders/order-info-panel'
+import PaymentTransactionCard from '@/components/orders/payment-transaction-card'
 
 function effectivePrice(price: number, discount_pct: number): number {
 	return discount_pct > 0
@@ -63,12 +65,18 @@ export default async function SeguimientoPage({
 
 	const uniqueSellerIds = [...new Set(allOrderPackages.map(pkg => pkg.id_seller))]
 
-	// Fetch tracking, all items and all sellers in parallel
-	const [tracking, { items: allItems }, sellerResults] = await Promise.all([
+	// Fetch tracking, items, sellers and payment history in parallel.
+	const [tracking, { items: allItems }, sellerResults, paymentHistory] = await Promise.all([
 		shippingService.trackPackage(id_package),
 		sellerService.getItems(),
 		Promise.all(uniqueSellerIds.map(id => sellerService.getSellerById(id))),
+		paymentsService.getPaymentHistory(buyer.id_buyer),
 	])
+
+	// Filter to find the one that belongs to this specific order.
+	const paymentTransaction = Array.isArray(paymentHistory)
+		? paymentHistory.find((t: any) => t.idPurchaseOrder === orderPackage.order.id_purchase_order) ?? null
+		: null
 
 	const itemMap: Record<string, typeof allItems[number]> = Object.fromEntries(
 		allItems.map(i => [i.id_item, i])
@@ -121,13 +129,16 @@ export default async function SeguimientoPage({
 
 			<div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-				{/* Left column: status + history */}
+				{/* Left column: status + history + payment */}
 				<div className="lg:col-span-8 flex flex-col gap-6">
 					<TrackingStatusCard
 						status={tracking.status || orderPackage.order.status}
 						carrier_name={tracking.carrier_name}
 					/>
 					<TrackingHistory history={tracking.history ?? []} />
+					{paymentTransaction && (
+						<PaymentTransactionCard transaction={paymentTransaction} />
+					)}
 				</div>
 
 				{/* Right column: order info */}
@@ -141,7 +152,6 @@ export default async function SeguimientoPage({
 						address={orderPackage.order.address ?? undefined}
 					/>
 				</div>
-
 			</div>
 		</>
 	)
