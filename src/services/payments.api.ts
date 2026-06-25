@@ -46,7 +46,7 @@ export const paymentsApi = {
 					'Content-Type': 'application/json',
 					...(token ? { Authorization: `Bearer ${token}` } : {}),
 				},
-				body: JSON.stringify({ status: 'CANCELADO' }),
+				body: JSON.stringify({ status: 'REEMBOLSADO' }),
 			}
 		)
 		return res.json()
