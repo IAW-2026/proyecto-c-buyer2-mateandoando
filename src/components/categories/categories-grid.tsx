@@ -15,21 +15,21 @@ type CategoryItem = {
 interface Props {
 	items: CategoryItem[]
 	category_name: string
-	onlyDiscounted: boolean
+	hasActiveFilters: boolean
 }
 
-export default function CategoriesGrid({ items, category_name, onlyDiscounted }: Props) {
+export default function CategoriesGrid({ items, category_name, hasActiveFilters }: Props) {
 	return (
 		<div className="flex-grow">
 			{items.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-20 text-on-surface-variant">
 					<p className="text-body-md">
-						{onlyDiscounted
-							? 'No hay productos con descuento en esta categoría.'
+						{hasActiveFilters
+							? 'No hay productos que coincidan con los filtros.'
 							: 'No hay productos en esta categoría.'
 						}
 					</p>
-					{onlyDiscounted && (
+					{hasActiveFilters && (
 						<Link
 							href={`/categorias/${category_name}`}
 							className="mt-4 text-primary text-body-sm hover:underline"
