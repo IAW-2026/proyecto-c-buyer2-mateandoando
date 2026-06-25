@@ -82,8 +82,19 @@ export default async function CarritoPage() {
         ...item,
         product: { ...item.product, stock: stockMap[item.id_item] ?? null },
     }))
-    
-    const productText = validItems.length === 1 ? 'producto' : 'productos'
+
+    // Merge duplicate rows (same id_item) that may exist in DB before the upsert fix
+    const mergedItems = itemsWithStock.reduce<typeof itemsWithStock>((acc, item) => {
+        const existing = acc.find(i => i.id_item === item.id_item)
+        if (existing) {
+            existing.quantity += item.quantity
+        } else {
+            acc.push({ ...item })
+        }
+        return acc
+    }, [])
+
+    const productText = mergedItems.length === 1 ? 'producto' : 'productos'
     const emptyCartText = 'Tu carrito está vacío.'
 
     return (
@@ -95,14 +106,14 @@ export default async function CarritoPage() {
 
                     <p className="text-body-lg font-body-lg text-on-surface-variant">
                         {
-                            validItems.length === 0 ?
+                            mergedItems.length === 0 ?
                                 emptyCartText :
-                                `${validItems.length} ${productText} en tu carrito.`
+                                `${mergedItems.length} ${productText} en tu carrito.`
                         }
                     </p>
                 </section>
                     
-                <CartContent initialItems={itemsWithStock} />
+                <CartContent initialItems={mergedItems} />
             </>
         )
     }
