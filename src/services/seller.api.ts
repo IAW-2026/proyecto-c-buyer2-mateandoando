@@ -42,6 +42,7 @@ function parseItem(raw: any) {
 		seller_name: raw.seller_name ?? '',
 		discount_pct: raw.discount_percentage ?? 0,
 		image_url: isValidImageUrl(raw.image_url) ? raw.image_url : null,
+		stock: raw.stock != null ? Number(raw.stock) : null,
 	}
 }
 
