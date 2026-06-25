@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { isServiceTokenValid } from '@/lib/auth/clerk'
 import { db } from '@/lib/db'
 
+const FECHA_CORTE = new Date('2026-06-21T00:00:00.000Z')
+
 export async function GET(req: NextRequest) {
 	const key = req.headers.get('x-api-key')
 
@@ -16,19 +18,24 @@ export async function GET(req: NextRequest) {
 		active_buyers,
 		revenue_result,
 	] = await Promise.all([
-		db.buyer.count(),
-		db.purchaseOrder.count(),
+		db.buyer.count({
+			where: { created_at: { gte: FECHA_CORTE } },
+		}),
+		db.purchaseOrder.count({
+			where: { created_at: { gte: FECHA_CORTE } },
+		}),
 		db.purchaseOrder.groupBy({
 			by: ['status'],
 			_count: { status: true },
+			where: { created_at: { gte: FECHA_CORTE } },
 		}),
 		db.buyer.count({
 			where: {
-				purchase_orders: { some: { status: 'APROBADO' } },
+				purchase_orders: { some: { status: 'APROBADO', created_at: { gte: FECHA_CORTE } } },
 			},
 		}),
 		db.purchaseOrder.aggregate({
-			where: { status: 'APROBADO' },
+			where: { status: 'APROBADO', created_at: { gte: FECHA_CORTE } },
 			_sum: { total_price: true },
 		}),
 	])
