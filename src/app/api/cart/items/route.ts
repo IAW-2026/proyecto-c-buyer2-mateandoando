@@ -38,9 +38,21 @@ export async function POST(request: Request) {
     update: {},
   })
 
-  const cartItem = await db.cartItem.create({
-    data: { id_cart: cart.id_cart, id_item, quantity },
+  const existing = await db.cartItem.findFirst({
+    where: { id_cart: cart.id_cart, id_item },
   })
+
+  let cartItem
+  if (existing) {
+    cartItem = await db.cartItem.update({
+      where: { id_cart_item: existing.id_cart_item },
+      data: { quantity: existing.quantity + quantity },
+    })
+  } else {
+    cartItem = await db.cartItem.create({
+      data: { id_cart: cart.id_cart, id_item, quantity },
+    })
+  }
 
   return Response.json(cartItem)
 }
