@@ -8,8 +8,9 @@ export const GET = withApiKeyAuth(
         const { id_user } = await params
 
         const buyer = await db.buyer.findUnique({
-            where: { clerk_user_id: id_user },
+            where: { id_buyer: id_user },
             select: {
+                clerk_user_id: true,
                 first_name: true,
                 last_name: true,
                 phone: true,
@@ -23,7 +24,7 @@ export const GET = withApiKeyAuth(
         let email = ''
 
         try {
-            const user = await (await clerkClient()).users.getUser(id_user)
+            const user = await (await clerkClient()).users.getUser(buyer.clerk_user_id)
             email = user.primaryEmailAddress?.emailAddress ?? ''
         } catch {
             // buyer exists in database but not in Clerk
