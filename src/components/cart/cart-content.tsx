@@ -20,6 +20,7 @@ type CartItem = {
         seller_name: string
         discount_pct: number
         image_url: string | null
+        stock: number | null
     }
 }
 
@@ -35,6 +36,12 @@ export default function CartContent({ initialItems }: Props) {
     const subtotal = items.reduce(
         (acc, item) => acc + effectivePrice(item) * item.quantity, 0
     )
+
+    const outOfStock = items.filter(i => i.product.stock === 0)
+    const insufficientStock = items.filter(
+        i => i.product.stock !== null && i.product.stock > 0 && i.quantity > i.product.stock
+    )
+    const hasStockIssue = outOfStock.length > 0 || insufficientStock.length > 0
     
     async function updateQuantity(id_cart_item: string, newQuantity: number) {
         if (newQuantity < 1) return
@@ -138,18 +145,30 @@ export default function CartContent({ initialItems }: Props) {
                         {/* Info */}
                         <div className="flex-grow min-w-0">
                             <p className="text-body-md font-semibold text-on-surface truncate">
-                            {item.product.name}
+                                {item.product.name}
                             </p>
 
-                            <p className="text-label-sm text-on-surface-variant">
-                                {item.product.seller_name}
-                            </p>
-                    
+                            <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-label-sm text-on-surface-variant">
+                                    {item.product.seller_name}
+                                </p>
+                                {item.product.stock === 0 && (
+                                    <span className="text-label-sm font-medium text-error bg-error/10 px-2 py-0.5 rounded-full">
+                                        Agotado
+                                    </span>
+                                )}
+                                {item.product.stock !== null && item.product.stock > 0 && item.quantity > item.product.stock && (
+                                    <span className="text-label-sm font-medium text-secondary bg-secondary/10 px-2 py-0.5 rounded-full">
+                                        Solo quedan {item.product.stock} disponibles
+                                    </span>
+                                )}
+                            </div>
+
                             <p className="text-body-md font-bold text-primary mt-1">
                                 ${price.toLocaleString('es-AR')}
                             </p>
                         </div>
-                
+
                         {/* Quantity stepper */}
                         <div className="flex items-center gap-2 flex-shrink-0">
                             <button
@@ -160,17 +179,20 @@ export default function CartContent({ initialItems }: Props) {
                             >
                                 <Minus size={14} />
                             </button>
-                        
+
                             <span className="w-8 text-center text-body-md select-none">
                                 {item.quantity}
                             </span>
-                            <button
-                                onClick={() => updateQuantity(item.id_cart_item, item.quantity + 1)}
-                                className="w-8 h-8 rounded border border-outline-variant flex items-center justify-center transition-colors"
-                                aria-label="Aumentar cantidad"
-                            >
-                                <Plus size={14} />
-                            </button>
+
+                            {(item.product.stock === null || item.quantity < item.product.stock) && (
+                                <button
+                                    onClick={() => updateQuantity(item.id_cart_item, item.quantity + 1)}
+                                    className="w-8 h-8 rounded border border-outline-variant flex items-center justify-center transition-colors"
+                                    aria-label="Aumentar cantidad"
+                                >
+                                    <Plus size={14} />
+                                </button>
+                            )}
                         </div>
                     
                         {/* Line total */}
@@ -227,12 +249,28 @@ export default function CartContent({ initialItems }: Props) {
                         </span>
                     </div>
                 
-                    <Link
-                        href="/checkout"
-                        className="w-full bg-primary text-on-primary text-center py-4 rounded-lg font-semibold text-body-md hover:opacity-90"
-                    >
-                        Ir al checkout
-                    </Link>
+                    {hasStockIssue ? (
+                        <>
+                            <button
+                                disabled
+                                className="w-full bg-on-surface/10 text-on-surface/40 text-center py-4 rounded-lg font-semibold text-body-md cursor-not-allowed"
+                            >
+                                Ir al checkout
+                            </button>
+                            <p className="text-label-sm text-error text-center">
+                                {outOfStock.length > 0
+                                    ? 'Retirá los productos agotados para continuar.'
+                                    : 'Ajustá las cantidades para continuar.'}
+                            </p>
+                        </>
+                    ) : (
+                        <Link
+                            href="/checkout"
+                            className="w-full bg-primary text-on-primary text-center py-4 rounded-lg font-semibold text-body-md hover:opacity-90"
+                        >
+                            Ir al checkout
+                        </Link>
+                    )}
                 
                     <Link
                         href="/"
