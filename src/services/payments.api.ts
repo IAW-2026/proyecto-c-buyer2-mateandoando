@@ -1,4 +1,4 @@
-const PAYMENTS_API_URL = process.env.PAYMENTS_API_URL
+const PAYMENTS_API_URL = process.env.PAYMENTS_API_URL?.replace(/\/$/, '')
 
 type CreatePaymentPayload = {
 	id_purchase_order: string
@@ -22,6 +22,19 @@ export const paymentsApi = {
 			body: JSON.stringify(payload),
 		})
 		return res.json()
+	},
+
+	async getPaymentHistory(id_buyer: string) {
+		const res = await fetch(
+			`${PAYMENTS_API_URL}/api/payments/history/buyer/${id_buyer}`,
+			{ headers: { 'X-Api-Key': process.env.BUYER_APP_SECRET_KEY ?? '' } },
+		)
+		if (!res.ok) return []
+		try {
+			return await res.json()
+		} catch {
+			return []
+		}
 	},
 
 	async cancelPayment(id_payment_operation: string, token?: string) {
