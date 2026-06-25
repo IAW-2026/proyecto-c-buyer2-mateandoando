@@ -104,12 +104,12 @@ export default function OrderRow({
 						Ver detalle
 					</Link>
 				)}
-				{status === 'PENDIENTE' && checkout_url && (
+				{(status === 'PENDIENTE' || status === 'RECHAZADO') && checkout_url && (
 					<a
 						href={checkout_url}
 						className="block text-center w-full bg-primary text-on-primary px-5 py-2 rounded-lg text-body-sm font-medium hover:opacity-90 transition-opacity"
 					>
-						Reintentar Pago
+						{status === 'PENDIENTE' ? 'Realizar Pago' : 'Reintentar Pago'}
 					</a>
 				)}
 				{status === 'APROBADO' && (
