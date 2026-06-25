@@ -20,6 +20,12 @@ const statusLabel: Record<string, string> = {
 	CANCELADO:   'Cancelado',
 }
 
+const paymentActionLabel: Record<string, string> = {
+	PENDIENTE: 'Completar pago',
+	RECHAZADO: 'Reintentar pago',
+	CANCELADO: 'Reintentar pago',
+}
+
 const statusColor: Record<string, string> = {
 	PENDIENTE:   'text-secondary',
 	APROBADO:    'text-primary',
@@ -33,7 +39,8 @@ interface Props {
 }
 
 export default function PaymentTransactionCard({ transaction }: Props) {
-	const { status, totalPrice, paymentHash, updatedAt } = transaction
+	const { status, totalPrice, paymentHash, updatedAt, url } = transaction
+	const actionLabel = paymentActionLabel[status]
 
 	return (
 		<div className="bg-surface-container-low border border-outline-variant rounded-xl p-6 flex flex-col gap-4">
@@ -79,13 +86,22 @@ export default function PaymentTransactionCard({ transaction }: Props) {
 						<span className="text-on-surface-variant">
 							Referencia de pago
 						</span>
-						
+
 						<span className="text-body-sm text-on-surface font-mono break-all">
 							{paymentHash}
 						</span>
 					</div>
 				)}
 			</div>
+
+			{actionLabel && url && (
+				<a
+					href={url}
+					className="w-full flex items-center justify-center bg-primary text-on-primary rounded-lg px-4 py-2.5 text-label-md font-medium hover:bg-primary/90 transition-colors"
+				>
+					{actionLabel}
+				</a>
+			)}
 		</div>
 	)
 }

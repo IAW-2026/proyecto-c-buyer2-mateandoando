@@ -25,19 +25,14 @@ export const paymentsApi = {
 	},
 
 	async getPaymentHistory(id_buyer: string) {
-		const url = `${PAYMENTS_API_URL}/api/payments/history/buyer/${id_buyer}`
-		console.log('[payments] getPaymentHistory url:', url)
-		const res = await fetch(url, {
-			headers: { 'X-Api-Key': process.env.BUYER_APP_SECRET_KEY ?? '' },
-		})
-		console.log('[payments] getPaymentHistory status:', res.status)
+		const res = await fetch(
+			`${PAYMENTS_API_URL}/api/payments/history/buyer/${id_buyer}`,
+			{ headers: { 'X-Api-Key': process.env.BUYER_APP_SECRET_KEY ?? '' } },
+		)
 		if (!res.ok) return []
 		try {
-			const data = await res.json()
-			console.log('[payments] getPaymentHistory response:', JSON.stringify(data))
-			return data
+			return await res.json()
 		} catch {
-			console.log('[payments] getPaymentHistory: response is not valid JSON')
 			return []
 		}
 	},
