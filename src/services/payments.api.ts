@@ -47,7 +47,7 @@ export const paymentsApi = {
 					'X-Api-Key': process.env.BUYER_APP_SECRET_KEY ?? '',
 					...(token ? { Authorization: `Bearer ${token}` } : {}),
 				},
-				body: JSON.stringify({ status: 'CANCELADO' }),
+				body: JSON.stringify({ status: 'REEMBOLSADO' }),
 			}
 		)
 		return res.json()
