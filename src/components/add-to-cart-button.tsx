@@ -7,11 +7,12 @@ import { useCartStore } from '@/store/cart-store'
 
 interface Props {
 	id_item: string
+	stock?: number | null
 }
 
 type State = 'idle' | 'loading' | 'added' | 'error'
 
-export default function AddToCartButton({ id_item }: Props) {
+export default function AddToCartButton({ id_item, stock }: Props) {
 	const [state, setState] = useState<State>('idle')
 	const { openSignIn } = useClerk()
 	const increment = useCartStore(s => s.increment)
@@ -39,7 +40,21 @@ export default function AddToCartButton({ id_item }: Props) {
 		},
 	}
 
+	const outOfStock = stock === 0
+
 	const { label, icon, className } = config[state]
+
+	if (outOfStock) {
+		return (
+			<button
+				disabled
+				className="w-full flex items-center justify-center gap-2 py-4 rounded-lg font-semibold text-body-md bg-on-surface/10 text-on-surface/40 cursor-not-allowed"
+			>
+				<ShoppingCart size={20} aria-hidden="true" />
+				Sin stock
+			</button>
+		)
+	}
 
 	async function handleClick() {
 		setState('loading')

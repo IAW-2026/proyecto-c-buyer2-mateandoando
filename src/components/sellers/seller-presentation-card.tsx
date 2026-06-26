@@ -4,9 +4,10 @@ interface Props {
 	name: string
 	description: string
 	item_count: number
+	rating?: number | null
 }
 
-export default function SellerPresentationCard({ name, description, item_count }: Props) {
+export default function SellerPresentationCard({ name, description, item_count, rating }: Props) {
 	return (
 		<section className="bg-surface-container-low rounded-xl border border-outline-variant p-8 mb-10 flex flex-col sm:flex-row gap-6 items-start">
 
@@ -27,6 +28,11 @@ export default function SellerPresentationCard({ name, description, item_count }
 					<span className="bg-surface-container px-3 py-1 rounded-full border border-outline-variant">
 						{item_count} {item_count === 1 ? 'producto' : 'productos'}
 					</span>
+					{rating != null && (
+						<span className="bg-surface-container px-3 py-1 rounded-full border border-outline-variant text-amber-500 font-medium">
+							★ {rating.toFixed(1)}
+						</span>
+					)}
 				</div>
 			</div>
 

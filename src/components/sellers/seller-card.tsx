@@ -5,9 +5,10 @@ interface Props {
 	id_seller: string
 	name: string
 	description: string
+	rating?: number | null
 }
 
-export default function SellerCard({ id_seller, name, description }: Props) {
+export default function SellerCard({ id_seller, name, description, rating }: Props) {
 	return (
 		<Link
 			href={`/vendedores/${id_seller}`}
@@ -27,6 +28,11 @@ export default function SellerCard({ id_seller, name, description }: Props) {
 			<p className="text-body-sm text-on-surface-variant line-clamp-2 flex-grow">
 				{description}
 			</p>
+
+			{/* Rating */}
+			{rating != null && (
+				<span className="text-label-sm text-amber-500 font-medium">★ {rating.toFixed(1)}</span>
+			)}
 
 			{/* CTA */}
 			<div className="flex items-center gap-1 text-primary text-label-md font-label-md">

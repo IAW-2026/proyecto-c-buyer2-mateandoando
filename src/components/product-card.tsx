@@ -12,6 +12,7 @@ interface Props {
 	seller_name: string
 	discount_pct: number
 	image_url?: string | null
+	rating?: number | null
 }
 
 export default function ProductCard({
@@ -23,6 +24,7 @@ export default function ProductCard({
 	seller_name,
 	discount_pct,
 	image_url,
+	rating,
 }: Props) {
 	const hasDiscount = discount_pct > 0
 	const discountedPrice = hasDiscount ? Math.round(price * (1 - discount_pct / 100)) : null
@@ -66,7 +68,12 @@ export default function ProductCard({
 			{/* Content */}
 			<div className="p-4 flex flex-col flex-grow">
 				<h3 className="text-body-md font-bold text-on-surface mb-1 line-clamp-1">{name}</h3>
-				<p className="text-label-sm text-on-surface-variant mb-1">{seller_name}</p>
+				<div className="flex items-center gap-2 mb-1">
+					<p className="text-label-sm text-on-surface-variant">{seller_name}</p>
+					{rating != null && (
+						<span className="text-label-sm text-amber-500 font-medium">★ {rating.toFixed(1)}</span>
+					)}
+				</div>
 				<p className="text-label-sm text-on-surface-variant mb-4 line-clamp-2">{description}</p>
 
 				<div className="mt-auto flex justify-between items-center">
