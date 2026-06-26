@@ -32,17 +32,19 @@ function isValidImageUrl(url: unknown): url is string {
 }
 
 function parseItem(raw: any) {
+	const seller = raw.seller
 	return {
 		id_item: raw.id_item ?? '',
 		name: raw.name ?? '',
 		price: Number(raw.price) || 0,
 		description: raw.description ?? '',
 		category_name: raw.category_name ?? '',
-		id_seller: raw.id_seller ?? '',
-		seller_name: raw.seller_name ?? '',
+		id_seller: raw.id_seller ?? seller?.id_seller ?? '',
+		seller_name: raw.seller_name ?? seller?.name ?? '',
 		discount_pct: raw.discount_percentage ?? 0,
 		image_url: isValidImageUrl(raw.image_url) ? raw.image_url : null,
 		stock: raw.stock != null ? Number(raw.stock) : null,
+		rating: seller?.rating != null ? Number(seller.rating) : (raw.rating != null ? Number(raw.rating) : null),
 	}
 }
 
@@ -102,7 +104,12 @@ export const sellerApi = {
 			headers: sellerServiceHeaders(),
 		})
 		const data = await res.json()
-		return toArray<{ id_seller: string; name: string; description: string }>(data)
+		return toArray<any>(data).map((raw: any) => ({
+			id_seller: raw.id_seller ?? raw.id ?? '',
+			name: raw.name ?? '',
+			description: raw.description ?? '',
+			rating: raw.rating != null ? Number(raw.rating) : null,
+		}))
 	},
 
 	async getSellerById(id_seller: string) {
@@ -120,6 +127,7 @@ export const sellerApi = {
 			id_seller: sellerData.id_seller ?? sellerData.id ?? id_seller,
 			name: sellerData.name ?? '',
 			description: sellerData.description ?? '',
+			rating: sellerData.rating != null ? Number(sellerData.rating) : null,
 			items,
 		}
 	},

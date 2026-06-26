@@ -28,6 +28,7 @@ export default async function SellerProfilePage({ params }: Props) {
 				name={seller.name}
 				description={seller.description}
 				item_count={seller.items.length}
+				rating={seller.rating}
 			/>
 
 			<SellerCatalog

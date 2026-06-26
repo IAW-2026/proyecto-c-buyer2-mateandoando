@@ -206,16 +206,19 @@ const SELLERS = [
 		id_seller: 'seller_1',
 		name: 'El Mateador',
 		description: 'Especialistas en kits y termos premium para el mate perfecto.',
+		rating: 4.5,
 	},
 	{
 		id_seller: 'seller_2',
 		name: 'Yerba Buena Shop',
 		description: 'La mejor selección de yerbas y accesorios importados.',
+		rating: 4.2,
 	},
 	{
 		id_seller: 'seller_3',
 		name: 'La Calabaza',
 		description: 'Mates artesanales de calabaza curados a mano.',
+		rating: 4.8,
 	},
 ]
 
@@ -243,12 +246,12 @@ export const sellerMock = {
 	async getItemDetail(_category_name: string, id_item: string) {
 		const item = ITEMS.find(i => i.id_item === id_item)
 		if (!item) return null
-		const stock = id_item === 'item_21' ? 0 : null
-		return { ...item, image_url: null, stock: stock as number | null }
+		const stock = id_item === 'item_21' ? 0 : id_item === 'item_1' ? 2 : null
+		return { ...item, image_url: null, stock: stock as number | null, rating: null as number | null }
 	},
 
 	async getSellers() {
-		return SELLERS
+		return SELLERS.map(s => ({ ...s }))
 	},
 
 	async getSellerById(id_seller: string) {
@@ -256,7 +259,7 @@ export const sellerMock = {
 		if (!seller) return null
 		return {
 			...seller,
-			items: ITEMS.filter(i => i.id_seller === id_seller).map(i => ({ ...i, image_url: null })),
+			items: ITEMS.filter(i => i.id_seller === id_seller).map(i => ({ ...i, image_url: null, rating: null })),
 		}
 	},
 

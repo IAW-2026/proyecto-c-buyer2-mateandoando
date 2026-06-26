@@ -10,6 +10,8 @@ interface Props {
 	price: number | undefined
 	discount_pct: number | undefined
 	description: string | undefined
+	rating?: number | null
+	stock?: number | null
 }
 
 export default function ProductInfo({
@@ -21,6 +23,8 @@ export default function ProductInfo({
 	price,
 	discount_pct,
 	description,
+	rating,
+	stock,
 }: Props) {
 	const safePrice = price ?? 0
 	const safePct = discount_pct ?? 0
@@ -32,7 +36,7 @@ export default function ProductInfo({
 	return (
 		<section className="lg:col-span-5 flex flex-col gap-6">
 
-			{/* Badges - TODO: review */}
+			{/* Badges */}
 			<div className="flex gap-2 flex-wrap">
 				<span className="bg-surface-container text-on-surface-variant text-label-sm font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
 					{category_name}
@@ -42,6 +46,16 @@ export default function ProductInfo({
 						−{discount_pct}% OFF
 					</span>
 				)}
+				{stock === 0 && (
+					<span className="bg-error/10 text-error text-label-sm font-semibold px-3 py-1 rounded-full">
+						Sin stock
+					</span>
+				)}
+				{stock != null && stock > 0 && stock <= 10 && (
+					<span className="bg-secondary/10 text-secondary text-label-sm font-semibold px-3 py-1 rounded-full">
+						Últimas {stock} unidades
+					</span>
+				)}
 			</div>
 
 			{/* Name */}
@@ -49,13 +63,18 @@ export default function ProductInfo({
 				{name}
 			</h1>
 
-			{/* Seller */}
-			<Link
-				href={`/vendedores/${id_seller}`}
-				className="text-body-sm text-on-surface-variant hover:text-primary transition-colors"
-			>
-				por <span className="font-semibold">{seller_name}</span>
-			</Link>
+			{/* Seller + rating */}
+			<div className="flex items-center gap-3">
+				<Link
+					href={`/vendedores/${id_seller}`}
+					className="text-body-sm text-on-surface-variant hover:text-primary transition-colors"
+				>
+					por <span className="font-semibold">{seller_name}</span>
+				</Link>
+				{rating != null && (
+					<span className="text-body-sm text-amber-500 font-medium">★ {rating.toFixed(1)}</span>
+				)}
+			</div>
 
 			{/* Price */}
 			<div className="flex items-baseline gap-4">
@@ -82,7 +101,7 @@ export default function ProductInfo({
 
 			{/* Add to cart */}
 			<div className="flex flex-col gap-3 pt-2">
-				<AddToCartButton id_item={id_item} />
+				<AddToCartButton id_item={id_item} stock={stock} />
 
 				{/* TODO: Improve this */}
 				<div className="flex justify-between items-center px-4 py-3 border border-outline-variant rounded-lg">

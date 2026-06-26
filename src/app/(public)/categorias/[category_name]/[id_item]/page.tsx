@@ -39,6 +39,8 @@ export default async function ProductDetailPage({ params }: Props) {
 					price={item.price}
 					discount_pct={item.discount_pct}
 					description={item.description}
+					rating={item.rating}
+					stock={item.stock}
 				/>
 			</div>
 		</>

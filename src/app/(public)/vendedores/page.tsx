@@ -24,6 +24,7 @@ export default async function VendedoresPage() {
 						id_seller={seller.id_seller}
 						name={seller.name}
 						description={seller.description}
+						rating={seller.rating}
 					/>
 				))}
 			</div>
